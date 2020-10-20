@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 
@@ -76,34 +77,30 @@ namespace _15._AnonymousThreat
         {
             int partLength = currString.Length / partitions;
             int remain = currString.Length % partitions;
-            int counterForPart = 0;
-            int counterForInsert = 0;
+            List<string> tempList = new List<string>();
+            StringBuilder saveConc = new StringBuilder();
+            int counter = 0;
 
-            for (int i = 0; i <= currString.Length - remain; i++)
+            for (int i = 0; i < partitions; i++)
             {
-                if (counterForPart == partLength)
+                if (i == (partitions - 1) && remain != 0)
                 {
-                    input.Insert(index + counterForInsert, concate.ToString());
-                    concate.Clear();
-                    counterForInsert++;
-                    counterForPart = 0;
-                    if (i >= currString.Length - remain)
-                    {
-                        break;
-                    }
-                    i--;
-                    continue;
-                }
-                counterForPart++;
-
-                if ((partitions - 1) == i && remain != 0)
-                {
-                    concate.Append(currString, i, currString.Length - i);
-                    input.Insert(index + (partLength + remain), concate.ToString());
+                    int startIndex = saveConc.Length;
+                    string tempString = currString.Substring(startIndex);
+                    tempList.Add(tempString);
                     break;
-                }  
-                concate.Append(currString[i]);
+                }
+
+                for (int j = 0; j < partLength; j++)
+                {
+                    concate.Append(currString[counter]);
+                    counter++;
+                }
+                tempList.Add(concate.ToString());
+                saveConc.Append(concate);
+                concate.Clear();
             }
+            input.InsertRange(index, tempList);
         }
     }
 }
