@@ -11,7 +11,6 @@ namespace _06._StoreBoxes
             string data = string.Empty;
 
             List<Box> boxes = new List<Box>();
-            List<Item> items = new List<Item>();
 
             while ((data = Console.ReadLine()) != "end")
             {
