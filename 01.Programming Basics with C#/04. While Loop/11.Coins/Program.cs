@@ -1,31 +1,65 @@
 ﻿using System;
 
-namespace _11.Coins
+namespace _11._Coins
 {
     class Program
     {
         static void Main(string[] args)
         {
-            decimal amount = decimal.Parse(Console.ReadLine());
-            int coin = 0;
+            double sum = double.Parse(Console.ReadLine());
+            int coins = 0;
+            
+            while (sum > 0)
+            {
+                sum = Math.Round(sum, 2);
 
-            coin += Convert.ToInt32(Math.Truncate(amount / 2));
-            amount = amount % 2;
-            coin += Convert.ToInt32(Math.Truncate(amount / 1));
-            amount = amount % 1;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.50m));
-            amount = amount % 0.5m;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.20m));
-            amount = amount % 0.20m;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.10m));
-            amount = amount % 0.10m;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.05m));
-            amount = amount % 0.05m;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.02m));
-            amount = amount % 0.02m;
-            coin += Convert.ToInt32(Math.Truncate(amount / 0.01m));
-            amount = amount % 0.01m;
-            Console.WriteLine(coin);
+                if (sum >= 3)
+                {
+                    sum -= 2;
+                    coins++;
+                }
+                else if (sum >= 2)
+                {
+                    sum -= 2;
+                    coins++;
+                }
+                else if (sum >= 1)
+                {
+                    sum -= 1;
+                    coins++;
+                }
+                else if (sum >= 0.50)
+                {
+                    sum -= 0.50;
+                    coins++;
+                }
+                else if (sum >= 0.20)
+                {
+                    sum -= 0.20;
+                    coins++;
+                }
+                else if (sum >= 0.10)
+                {
+                    sum -= 0.10;
+                    coins++;
+                }
+                else if (sum >= 0.05)
+                {
+                    sum -= 0.05;
+                    coins++;
+                }
+                else if (sum >= 0.02)
+                {
+                    sum -= 0.02;
+                    coins++;
+                }
+                else if (sum >= 0.01)
+                {
+                    sum -= 0.01;
+                    coins++;
+                }
+            }
+            Console.WriteLine(coins);
         }
     }
 }
