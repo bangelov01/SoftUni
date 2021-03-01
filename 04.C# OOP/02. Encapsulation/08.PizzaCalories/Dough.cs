@@ -28,12 +28,8 @@ namespace _02.PizzaCalories
             get => this.type; 
             private set
             {
-                string holder = value.ToLower();
 
-                if (holder != "white" && holder != "wholegrain")
-                {
-                    throw new Exception("Invalid type of dough.");
-                }
+                this.ThrowIfInvalidException(value);
 
                 this.type = value;
             }
@@ -43,12 +39,8 @@ namespace _02.PizzaCalories
             get => this.bakingTechnique;
             private set
             {
-                string holder = value.ToLower();
 
-                if (holder != "crispy" && holder != "chewy" && holder != "homemade")
-                {
-                    throw new Exception("Invalid type of dough.");
-                }
+                this.ThrowIfInvalidException(value);
 
                 this.bakingTechnique = value;
             }
@@ -92,6 +84,16 @@ namespace _02.PizzaCalories
             }
 
             return (caloriesPerGram * weight) * typeHolder * bakingHolder;
+        }
+
+        private void ThrowIfInvalidException(string value)
+        {
+            string holder = value.ToLower();
+
+            if (holder != "white" && holder != "wholegrain" && holder != "crispy" && holder != "chewy" && holder != "homemade")
+            {
+                throw new Exception("Invalid type of dough.");
+            }
         }
     }
 }
