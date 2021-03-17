@@ -17,7 +17,6 @@ namespace MyLogger.Loggers
 
         public void Write(string content)
         {
-
             File.AppendAllText(filePath, content);
         }
     }

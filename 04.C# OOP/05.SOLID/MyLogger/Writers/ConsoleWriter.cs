@@ -16,6 +16,11 @@ namespace MyLogger.Writers
         {
         }
 
+        public ConsoleWriter(ILayout layout, ErrorLevel error) 
+            : base(layout,error)
+        {
+        }
+
         public override void Write(string date, ErrorLevel level, string message)
         {
             string output = string.Format(layout.Template, date, level, message);

@@ -18,6 +18,11 @@ namespace MyLogger.Writers
             this.logFile = logFile;
         }
 
+        public FileWriter(ILayout layout, ILogFile logFile, ErrorLevel error) : base(layout,error)
+        {
+            this.logFile = logFile;
+        }
+
         public override void Write(string date, ErrorLevel level, string message)
         {
             string content = string.Format(layout.Template, date, level, message + Environment.NewLine);

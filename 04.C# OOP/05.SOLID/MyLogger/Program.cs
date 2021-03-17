@@ -5,6 +5,7 @@ using MyLogger.Loggers.Contracts;
 using MyLogger.Writers;
 using MyLogger.Writers.Contracts;
 using System;
+using MyLogger.Enums;
 
 namespace MyLogger
 {
@@ -12,24 +13,19 @@ namespace MyLogger
     {
         static void Main(string[] args)
         {
-            //ILayout consoleLayout = new ConsoleLayout();
-            //IWriter consoleWriter = new ConsoleWriter(consoleLayout);
-            //ILogger logger = new Log(consoleWriter);
 
-            //logger.Error("3/26/2015 2:08:11 PM", "Error parsing JSON.");
-            //logger.Info("3/26/2015 2:08:11 PM", "User Pesho successfully registered.");
+            //Third implementation with report threshold - test.
 
-            var simpleLayout = new ConsoleLayout();
-            var consoleWriter = new ConsoleWriter(simpleLayout);
+            var jsonLayout = new XmlLayout();
+            var writer = new FileWriter(jsonLayout, new LogFile(), ErrorLevel.Warning);
 
-            var file = new LogFile();
-            var fileWriter = new FileWriter(simpleLayout, file);
+            var loggerFile = new Log(writer);
 
-            var logger = new Log(consoleWriter, fileWriter);
-
-            logger.Error("3/26/2015 2:08:11 PM", "Error parsing JSON.");
-            logger.Info("3/26/2015 2:08:11 PM", "User Pesho successfully registered.");
-
+            loggerFile.Info("3/31/2015 5:33:07 PM", "Everything seems fine");
+            loggerFile.Warning("3/31/2015 5:33:07 PM", "Warning: ping is too high - disconnect imminent");
+            loggerFile.Error("3/31/2015 5:33:07 PM", "Error parsing request");
+            loggerFile.Critical("3/31/2015 5:33:07 PM", "No connection string found in App.config");
+            loggerFile.Fatal("3/31/2015 5:33:07 PM", "mscorlib.dll does not respond");
 
 
         }

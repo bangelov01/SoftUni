@@ -18,6 +18,12 @@ namespace MyLogger.Writers
             this.layout = layout;
         }
 
+        protected Writer(ILayout layout, ErrorLevel error) : this(layout)
+        {
+            ErrorLevel = error;
+        }
+
+        public ErrorLevel ErrorLevel { get; private set; }
         public abstract void Write(string date, ErrorLevel level, string message);
     }
 }

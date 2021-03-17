@@ -18,21 +18,38 @@ namespace MyLogger.Loggers
             this.writers = writers;
         }
 
+        public void Info(string date, string message)
+        {
+            WriteAll(date, ErrorLevel.Info, message);
+        }
+
+        public void Warning(string date, string message)
+        {
+            WriteAll(date, ErrorLevel.Warning, message);
+        }
+
         public void Error(string date, string message)
         {
             WriteAll(date, ErrorLevel.Error, message);
         }
 
-        public void Info(string date, string message)
+        public void Critical(string date, string message)
         {
-            WriteAll(date, ErrorLevel.Info, message);
+            WriteAll(date, ErrorLevel.Critical, message);
+        }
+        public void Fatal(string date, string message)
+        {
+            WriteAll(date, ErrorLevel.Fatal, message);
         }
 
         private void WriteAll(string date, ErrorLevel level, string message)
         {
             foreach (var writer in writers)
             {
-                writer.Write(date, level, message);
+                if (level >= writer.ErrorLevel)
+                {
+                    writer.Write(date, level, message);
+                }
             }
         }
     }

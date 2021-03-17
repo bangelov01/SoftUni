@@ -10,6 +10,7 @@ namespace MyLogger.Writers.Contracts
 {
     public interface IWriter
     {
+        ErrorLevel ErrorLevel { get; }
         void Write(string date, ErrorLevel level, string message);
     }
 }
