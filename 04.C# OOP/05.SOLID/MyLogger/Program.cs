@@ -6,6 +6,11 @@ using MyLogger.Writers;
 using MyLogger.Writers.Contracts;
 using System;
 using MyLogger.Enums;
+using System.Collections.Generic;
+using MyLogger.Core.Factories.Contracts;
+using MyLogger.Core.Factories;
+using MyLogger.Core.Contracts;
+using MyLogger.Core;
 
 namespace MyLogger
 {
@@ -13,21 +18,18 @@ namespace MyLogger
     {
         static void Main(string[] args)
         {
+            Dictionary<string, ILayout> layoutsByType = new Dictionary<string, ILayout>()
+            {
+                {nameof(ConsoleLayout), new ConsoleLayout()},
+                {nameof(XmlLayout), new XmlLayout()},
+                {nameof(JsonLayout), new JsonLayout()}
+            };
 
-            //Third implementation with report threshold - test.
+            IWriterFactory writerFactory = new WriterFactory();
 
-            var jsonLayout = new XmlLayout();
-            var writer = new FileWriter(jsonLayout, new LogFile(), ErrorLevel.Warning);
+            IEngine engine = new Engine(layoutsByType, writerFactory);
 
-            var loggerFile = new Log(writer);
-
-            loggerFile.Info("3/31/2015 5:33:07 PM", "Everything seems fine");
-            loggerFile.Warning("3/31/2015 5:33:07 PM", "Warning: ping is too high - disconnect imminent");
-            loggerFile.Error("3/31/2015 5:33:07 PM", "Error parsing request");
-            loggerFile.Critical("3/31/2015 5:33:07 PM", "No connection string found in App.config");
-            loggerFile.Fatal("3/31/2015 5:33:07 PM", "mscorlib.dll does not respond");
-
-
+            engine.Run();
         }
     }
 }

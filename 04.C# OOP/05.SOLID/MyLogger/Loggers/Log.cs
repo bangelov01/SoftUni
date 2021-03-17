@@ -42,6 +42,18 @@ namespace MyLogger.Loggers
             WriteAll(date, ErrorLevel.Fatal, message);
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in this.writers)
+            {
+                sb.AppendLine(item.ToString());
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
         private void WriteAll(string date, ErrorLevel level, string message)
         {
             foreach (var writer in writers)

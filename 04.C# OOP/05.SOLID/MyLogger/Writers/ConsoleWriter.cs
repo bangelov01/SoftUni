@@ -26,6 +26,8 @@ namespace MyLogger.Writers
             string output = string.Format(layout.Template, date, level, message);
 
             WriteToConsole(output);
+
+            this.MessagesCount++;
         }
 
         private void WriteToConsole(string output)

@@ -28,11 +28,18 @@ namespace MyLogger.Writers
             string content = string.Format(layout.Template, date, level, message + Environment.NewLine);
 
             WriteToFile(content);
+
+            this.MessagesCount++;
         }
 
         private void WriteToFile(string content)
         {
             logFile.Write(content);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $", File size: {this.logFile.Size}";
         }
     }
 }

@@ -24,6 +24,13 @@ namespace MyLogger.Writers
         }
 
         public ErrorLevel ErrorLevel { get; private set; }
+
+        protected int MessagesCount { get; set; }
         public abstract void Write(string date, ErrorLevel level, string message);
+
+        public override string ToString()
+        {
+            return $"Appender type: {this.GetType().Name}, Layout type: {layout.GetType().Name}, Report level: {ErrorLevel}, Messages appended: {MessagesCount}";
+        }
     }
 }
