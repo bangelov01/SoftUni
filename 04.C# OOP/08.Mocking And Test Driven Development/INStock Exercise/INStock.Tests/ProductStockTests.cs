@@ -163,6 +163,66 @@
 
             Assert.AreEqual(expectedProduct, productStock.FindMostExpensiveProduct());
         }
+        [Test]
+        [TestCase(2)]
+        [TestCase(50)]
+        public void When_FindAllByQuantityIsCalled_WithExistingQuantity_ShouldReturnProducts_Else_ShouldReturnEmptyCollection(int quantity)
+        {
+            var products = CreateMultipleProducts();
+
+            products.Add(CreateSingleProduct());
+
+            AddProductsToStock(products);
+
+            var expectedResult = products.FindAll(p => p.Quantity == quantity);
+
+            CollectionAssert.AreEquivalent(expectedResult, productStock.FindAllByQuantity(quantity));
+        }
+
+        [Test]
+        public void When_GetEnumIsUsed_shouldReturnAllProducts()
+        {
+            var products = CreateMultipleProducts();
+
+            AddProductsToStock(products);
+
+            var expected = new List<IProduct>();
+
+            foreach (var item in productStock)
+            {
+                expected.Add(item);
+            }
+
+            CollectionAssert.AreEquivalent(products, expected);
+        }
+
+        [Test]
+        public void When_RemoveIsCalled_ShouldRemoveItem_AndReturnTrue()
+        {
+            var products = CreateMultipleProducts();
+
+            AddProductsToStock(products);
+
+            var productToRemove = products[0];
+
+            var result = productStock.Remove(productToRemove);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void When_RemoveIsCalled_ShouldReturnFalse()
+        {
+            var products = CreateMultipleProducts();
+
+            AddProductsToStock(products);
+
+            var productToRemove = CreateSingleProduct();
+
+            var result = productStock.Remove(productToRemove);
+
+            Assert.IsFalse(result);
+        }
 
         private IProduct CreateSingleProduct()
         {
