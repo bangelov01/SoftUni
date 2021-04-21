@@ -1,0 +1,4 @@
+﻿London 6000000
+Sofia 2000000
+Washington 10000000
+Beijing 20000000
