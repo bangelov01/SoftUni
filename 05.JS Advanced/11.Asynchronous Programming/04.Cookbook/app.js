@@ -1,28 +1,82 @@
-window.addEventListener(`load`, () => {
+window.addEventListener(`load`, async() => {
 
     const url = `http://localhost:3030/jsonstore/cookbook/recipes`;
+    const mainElment = document.querySelector(`main`);
 
-    fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-            const mainElement = document.querySelector(`body main`);
-            mainElement.innerHTML = ``;
+    const recipes = await getRecipes(url);
+    const cards = recipes.map(createRecipePreview);
 
-            for (const recipe in data) {
-                const result = e(`article`, {className: `preview`},
-                    e(`div`, {className: `title`}, e(`h2`, {}, data[recipe].name)),
-                    e(`div`, {className: `small`}, e(`img`, {src: data[recipe].img}))
-                );
+    mainElment.innerHTML = ``;
+    cards.forEach(card => mainElment.appendChild(card));
 
-                mainElement.appendChild(result);
-            }
-        })
-        .catch((error) => {
-            alert(error.message);
-        });
 })
 
-function e(type, attributes, ...content) {
+async function getRecipes(url) {
+
+    try {
+        const response = await fetch(url);
+        const recipes = await response.json();
+
+        return Object.values(recipes);
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function getRecipeById(id) {
+
+    try {
+        const idUrl = `http://localhost:3030/jsonstore/cookbook/details/${id}`;
+
+        const response = await fetch(idUrl);
+        const recipe = await response.json();
+
+        return recipe;
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function createRecipePreview(recipe) {
+
+    const result = createElement(`article`, { className: `preview`, onClick: toggleCard },
+        createElement(`div`, { className: `title` }, createElement(`h2`, {}, recipe.name)),
+        createElement(`div`, { className: `small` }, createElement(`img`, { src: recipe.img }))
+    );
+
+    return result;
+
+    async function toggleCard() {
+
+        const fullRecipe = await getRecipeById(recipe._id);
+
+        result.replaceWith(createRecipeCard(fullRecipe));
+    }
+}
+
+function createRecipeCard(fullRecipe) {
+
+    const result = createElement(`article`, {},
+        createElement(`h2`, {}, fullRecipe.name,),
+        createElement(`div`, { className: `band` },
+            createElement(`div`, { className: `thumb` }, createElement(`img`, { src: fullRecipe.img })),
+            createElement(`div`, { className: `ingredients` },
+                createElement(`h3`, {}, `Ingredients:`),
+                createElement(`ul`, {}, fullRecipe.ingredients.map(i => createElement(`li`, {}, i))),
+            )
+        ),
+        createElement(`div`, {className: `description`},
+            createElement(`h3`, {}, `Preparation:`),
+            fullRecipe.steps.map(s => createElement(`p`, {}, s))
+        ),
+    )
+
+    return result;
+}
+
+function createElement(type, attributes, ...content) {
     const result = document.createElement(type);
 
     for (let [attr, value] of Object.entries(attributes || {})) {
@@ -46,12 +100,3 @@ function e(type, attributes, ...content) {
 
     return result;
 }
-
-/*<article class="preview">
-            <div class="title">
-                <h2>Title</h2>
-            </div>
-            <div class="small">
-                <img src="assets/lasagna.jpg">
-            </div>
-        </article>*/
