@@ -52,7 +52,7 @@ async function solve() {
         await fetch(baseUrl + e.target.dataset.id, {
             method: `put`,
             headers: { "Content-Type": `application/json` },
-            body: JSON.stringify({ author: dataAuthor, title: dataTitle })
+            body: JSON.stringify({ title: dataTitle, author: dataAuthor })
         });
 
         e.target.style.display = `none`;
@@ -77,7 +77,7 @@ async function solve() {
         await fetch(baseUrl, {
             method: `post`,
             headers: { "Content-Type": `application/json` },
-            body: JSON.stringify({ author: dataAuthor, title: dataTitle })
+            body: JSON.stringify({ title: dataTitle, author: dataAuthor })
         });
         
         e.target.reset();
@@ -112,7 +112,7 @@ async function solve() {
 
                 let newRow = tBody.insertRow();
 
-                Object.keys(bookValue).forEach((k) => {
+                Object.keys(bookValue).sort((a,b) => b.localeCompare(a)).forEach((k) => {
                     newRow.insertCell().textContent = bookValue[k];
                 });
 
