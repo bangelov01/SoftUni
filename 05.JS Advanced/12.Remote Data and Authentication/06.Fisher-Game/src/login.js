@@ -20,9 +20,11 @@ document.getElementById(`login-form`).addEventListener(`submit`, async (e) => {
     const data = await response.json();
     console.log(data);
     sessionStorage.setItem(`userToken`, data.accessToken);
+    sessionStorage.setItem(`userId`, data._id);
     e.target.reset();
 
-    window.location.pathname = `./index.html`;
+    console.log(window.location.pathname);
+    window.location.pathname = "/05.Fisher-Game/index.html";
 
     return alert(`Login successful!`);
 })

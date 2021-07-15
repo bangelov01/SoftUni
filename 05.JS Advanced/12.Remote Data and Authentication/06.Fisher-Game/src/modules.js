@@ -1,4 +1,4 @@
-export async function updateCatches(currentOwnerId) {
+export async function updateCatches() {
 
     let catchesElement = document.getElementById(`catches`);
     catchesElement.innerHTML = ``;
@@ -13,37 +13,40 @@ export async function updateCatches(currentOwnerId) {
 
     });
 
-    enableButtons(currentOwnerId);
+    if (sessionStorage.getItem('userToken') != null) {     
+
+        enableButtons();
+    }
 
     function createCatchDiv(c) {
 
-        const result = createElement(`div`, { className: "catch", ownerid: `${c._ownerId}`, id: `${c._id}` },
-            createElement(`label`, {}, `Angler`),
-            createElement(`input`, { type: `text`, className: `angler`, value: c.angler }),
-            createElement(`hr`, {}),
-            createElement(`label`, {}, `Weight`),
-            createElement(`input`, { type: `number`, className: `weight`, value: c.weight }),
-            createElement(`hr`, {}),
-            createElement(`label`, {}, `Species`),
-            createElement(`input`, { type: `text`, className: `species`, value: c.species }),
-            createElement(`hr`, {}),
-            createElement(`label`, {}, `Location`),
-            createElement(`input`, { type: `text`, className: `location`, value: c.location }),
-            createElement(`hr`, {}),
-            createElement(`label`, {}, `Bait`),
-            createElement(`input`, { type: `text`, className: `Bait`, value: c.bait }),
-            createElement(`hr`, {}),
-            createElement(`label`, {}, `Capture Time`),
-            createElement(`input`, { type: `number`, className: `captureTime`, value: c.weight }),
-            createElement(`button`, { className: `update`, disabled: `disabled` }, `Update`),
-            createElement(`button`, { className: `delete`, disabled: `disabled` }, `Delete`),
+        const result = e(`div`, { className: "catch", ownerid: `${c._ownerId}`, id: `${c._id}` },
+            e(`label`, {}, `Angler`),
+            e(`input`, { type: `text`, className: `angler`, value: c.angler }),
+            e(`hr`, {}),
+            e(`label`, {}, `Weight`),
+            e(`input`, { type: `number`, className: `weight`, value: c.weight }),
+            e(`hr`, {}),
+            e(`label`, {}, `Species`),
+            e(`input`, { type: `text`, className: `species`, value: c.species }),
+            e(`hr`, {}),
+            e(`label`, {}, `Location`),
+            e(`input`, { type: `text`, className: `location`, value: c.location }),
+            e(`hr`, {}),
+            e(`label`, {}, `Bait`),
+            e(`input`, { type: `text`, className: `bait`, value: c.bait }),
+            e(`hr`, {}),
+            e(`label`, {}, `Capture Time`),
+            e(`input`, { type: `number`, className: `captureTime`, value: c.captureTime}),
+            e(`button`, { className: `update`, disabled: `disabled` }, `Update`),
+            e(`button`, { className: `delete`, disabled: `disabled` }, `Delete`),
 
         )
 
         return result;
     }
 
-    function createElement(type, attributes, ...content) {
+    function e(type, attributes, ...content) {
         const result = document.createElement(type);
 
         for (let [attr, value] of Object.entries(attributes || {})) {
@@ -68,11 +71,12 @@ export async function updateCatches(currentOwnerId) {
         return result;
     }
 
-    function enableButtons(ownerId) {
+    function enableButtons() {
 
+        const userIdToken = sessionStorage.getItem(`userId`);
         const catchElements = document.getElementById(`catches`).children;
         Array.from(catchElements).forEach(el => {
-            if (el.ownerid == ownerId) {
+            if (el.ownerid == userIdToken) {
                 el.querySelector(`.update`).disabled = false;
                 el.querySelector(`.delete`).disabled = false;
             }

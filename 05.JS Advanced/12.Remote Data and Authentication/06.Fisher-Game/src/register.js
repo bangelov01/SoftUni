@@ -27,12 +27,14 @@ document.getElementById(`register-form`).addEventListener(`submit`, async(e) => 
     }
     const data = await response.json();
     sessionStorage.setItem(`userToken`, data.accessToken);
+    sessionStorage.setItem(`userId`, data._id);
 
     e.target.previousElementSibling.style.display = `none`;
     e.target.style.display = `none`;
     e.target.reset();
 
-    window.location.pathname = `./index.html`;
+    console.log(window.location.pathname);
+    window.location.pathname = "/05.Fisher-Game/index.html";
 
     return alert(`Registration successful!`);
 });

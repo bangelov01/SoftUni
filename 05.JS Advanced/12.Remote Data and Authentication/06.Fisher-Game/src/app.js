@@ -1,16 +1,14 @@
 const userToken = sessionStorage.getItem(`userToken`);
 import { updateCatches } from "./modules.js"; 
 
-let currentOwnerId = ``;
-
 if (userToken != null) {
 
     document.getElementById(`user`).style.display = `inline-block`;
     document.querySelector(`#addForm .add`).disabled = false;
     document.querySelector(`#catches h3`).textContent = `Click Load to preview catches,\r\nor Add to add catch!`;
 
-    document.getElementById(`logoutBtn`).addEventListener(`click`, async () => {
-
+    document.getElementById(`logoutBtn`).addEventListener(`click`, async (e) => {
+        e.preventDefault();
         const response = await fetch(`http://localhost:3030/users/logout`, {
             method: `get`,
             headers: { "X-Authorization": userToken }
@@ -22,8 +20,7 @@ if (userToken != null) {
         }
 
         sessionStorage.removeItem(`userToken`);
-        currentOwnerId = ``;
-        window.location.pathname = `index.html`;
+        window.location.pathname = "/05.Fisher-Game/index.html";
     });
 
     document.querySelector(`#addForm .add`).addEventListener(`click`, async() => {
@@ -57,11 +54,7 @@ if (userToken != null) {
             addCatchEl[i].value = ``;
         }
 
-        const result = await response.json();
-        currentOwnerId = result._ownerId;
-
-        //await updateCatches(currentOwnerId);
-        updateCatches(currentOwnerId);
+        updateCatches();
     });
 }
 else {
@@ -70,8 +63,7 @@ else {
 
 document.querySelector(`.load`).addEventListener(`click`, async () => {
 
-    //await updateCatches(currentOwnerId);
-    updateCatches(currentOwnerId);
+    updateCatches();
 });
 
 document.getElementById(`catches`).addEventListener(`click`, async (e) => {
@@ -91,10 +83,13 @@ document.getElementById(`catches`).addEventListener(`click`, async (e) => {
 
             postObj[prop] = inputs[i].value;
         }
-        console.log(e.target.parentElement.id);
+        console.log(postObj);
         const response = await fetch(`http://localhost:3030/data/catches/${e.target.parentElement.id}`, {
             method: `put`,
-            headers: {"X-Authorization": userToken},
+            headers: {
+                "Content-Type": `application/json`,
+                "X-Authorization": userToken
+            },
             body: JSON.stringify(postObj)
         });
 
@@ -103,98 +98,18 @@ document.getElementById(`catches`).addEventListener(`click`, async (e) => {
             return alert(error.message);
         }
 
-        //await updateCatches(currentOwnerId);
-        updateCatches(currentOwnerId);
+        updateCatches();
     }
     else if (e.target.className == `delete` && e.target.disabled == false) {
-        await fetch(`http://localhost:3030/data/catches/${e.target.parentElement.id}`,{
-            method: `delete`,
-            headers: {"X-Authorization": userToken}
-        });
-
-        e.target.parentElement.remove();
+        const message = confirm('Are you sure you want to delete the catch?');
+        if (message) {
+            await fetch(`http://localhost:3030/data/catches/${e.target.parentElement.id}`,{
+                method: `delete`,
+                headers: {"X-Authorization": userToken}
+            });
+    
+            e.target.parentElement.remove();
+        }
     }
 });
-
-// async function updateCatches(currentOwnerId) {
-
-//     let catchesElement = document.getElementById(`catches`);
-//     catchesElement.innerHTML = ``;
-
-//     const response = await fetch(`http://localhost:3030/data/catches`);
-//     const catches = await response.json();
-
-//     Object.values(catches).forEach(c => {
-
-//         const el = createCatchDiv(c);
-//         catchesElement.appendChild(el);
-
-//     });
-
-//     enableButtons(currentOwnerId);
-
-//     function createCatchDiv(c) {
-
-//         const result = createElement(`div`, { className: "catch", ownerid: `${c._ownerId}`, id: `${c._id}` },
-//             createElement(`label`, {}, `Angler`),
-//             createElement(`input`, { type: `text`, className: `angler`, value: c.angler }),
-//             createElement(`hr`, {}),
-//             createElement(`label`, {}, `Weight`),
-//             createElement(`input`, { type: `number`, className: `weight`, value: c.weight }),
-//             createElement(`hr`, {}),
-//             createElement(`label`, {}, `Species`),
-//             createElement(`input`, { type: `text`, className: `species`, value: c.species }),
-//             createElement(`hr`, {}),
-//             createElement(`label`, {}, `Location`),
-//             createElement(`input`, { type: `text`, className: `location`, value: c.location }),
-//             createElement(`hr`, {}),
-//             createElement(`label`, {}, `Bait`),
-//             createElement(`input`, { type: `text`, className: `Bait`, value: c.bait }),
-//             createElement(`hr`, {}),
-//             createElement(`label`, {}, `Capture Time`),
-//             createElement(`input`, { type: `number`, className: `captureTime`, value: c.weight }),
-//             createElement(`button`, { className: `update`, disabled: `disabled` }, `Update`),
-//             createElement(`button`, { className: `delete`, disabled: `disabled` }, `Delete`),
-
-//         )
-
-//         return result;
-//     }
-
-//     function createElement(type, attributes, ...content) {
-//         const result = document.createElement(type);
-
-//         for (let [attr, value] of Object.entries(attributes || {})) {
-//             if (attr.substring(0, 2) == 'on') {
-//                 result.addEventListener(attr.substring(2).toLocaleLowerCase(), value);
-//             } else {
-//                 result[attr] = value;
-//             }
-//         }
-
-//         content = content.reduce((a, c) => a.concat(Array.isArray(c) ? c : [c]), []);
-
-//         content.forEach(e => {
-//             if (typeof e == 'string' || typeof e == 'number') {
-//                 const node = document.createTextNode(e);
-//                 result.appendChild(node);
-//             } else {
-//                 result.appendChild(e);
-//             }
-//         });
-
-//         return result;
-//     }
-
-//     function enableButtons(ownerId) {
-
-//         const catchElements = document.getElementById(`catches`).children;
-//         Array.from(catchElements).forEach(el => {
-//             if (el.ownerid == ownerId) {
-//                 el.querySelector(`.update`).disabled = false;
-//                 el.querySelector(`.delete`).disabled = false;
-//             }
-//         });
-//     }
-// }
 
