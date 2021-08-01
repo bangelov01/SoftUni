@@ -37,6 +37,6 @@ export async function myHomePage(ctx) {
         const furnitures = await getUserFurniture(userId);
         ctx.render(myHomeTemplate(furnitures));
     } catch (error) {
-        ctx.render(myHomeTemplate([]));
+        alert(error.message)
     } 
 }

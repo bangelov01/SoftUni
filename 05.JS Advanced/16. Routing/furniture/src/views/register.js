@@ -57,7 +57,7 @@ export async function registerPage(ctx) {
             ctx.page.redirect('/');
 
         } catch (error) {
-            return alert(error.message);
+            alert(error.message);
         }
     }
 }

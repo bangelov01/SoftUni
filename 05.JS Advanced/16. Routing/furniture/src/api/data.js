@@ -7,8 +7,17 @@ export const register = api.register;
 export const login = api.login;
 export const logout = api.logout;
 
-async function getFurnitures() {
-    return await api.get(host + "/data/catalog");
+async function getFurnitures(searchParam) {
+    
+    if (searchParam) {
+        return await api.get(host + "/data/catalog?where=" + encodeURIComponent(`make LIKE "${searchParam}"`));
+    } else {
+        return await api.get(host + "/data/catalog");
+    }
+}
+
+async function getSearch(searchParam) {
+    
 }
 
 async function getFurnitureById(id) {
@@ -37,5 +46,6 @@ export {
     createFurniture,
     updateFurniture,
     deleteFurniture,
-    getUserFurniture
+    getUserFurniture,
+    getSearch
 }
