@@ -1,5 +1,6 @@
 import { html } from "../../node_modules/lit-html/lit-html.js";
 import { getFurnitureById, deleteFurniture } from "../api/data.js";
+import { createModal } from "../modals/modal.js"
 
 const detailsTemplate = (item, isOwner, onDelete) => html`
         <div class="row space-top">
@@ -22,7 +23,7 @@ const detailsTemplate = (item, isOwner, onDelete) => html`
                 <p>Description: <span>${item.description}</span></p>
                 <p>Price: <span>${item.price}</span></p>
                 <p>Material: <span>${item.material}</span></p>
-                <div style=${isOwner ? "display:inline-block" : "display:none"}>
+                <div style=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx>
                     <a href=${`/edit/${item._id}`} class="btn btn-info">Edit</a>
                     <a @click=${onDelete} href="javascript:void(0)" class="btn btn-red">Delete</a>
                 </div>
@@ -39,8 +40,9 @@ export async function detailsPage(ctx) {
         ctx.render(detailsTemplate(item, ownerId == item._ownerId, onDelete));
 
         async function onDelete() {
-            const confirmed = confirm('Are you sure you want to delete this furniture?');
 
+            const confirmed = await createModal('Are you sure you want to delete this furniture?');
+            console.log(confirmed);
             if (confirmed) {
                 await deleteFurniture(itemId);
                 ctx.page.redirect('/');

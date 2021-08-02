@@ -1,12 +1,12 @@
 import { html } from "../../node_modules/lit-html/lit-html.js"
 import { login } from "../api/data.js"
+import { notify } from "../notifications/notification.js"
 
-const loginTemplate = (onSubmit, isInvalidEmail, isInvalidPassword, msg) => html`
+const loginTemplate = (onSubmit, isInvalidEmail, isInvalidPassword) => html`
         <div class="row space-top">
             <div class="col-md-12">
                 <h1>Login User</h1>
                 <p>Please fill all fields.</p>
-                ${msg? html`<p style="color:red">${'*' + msg}</p>` : ""}
             </div>
         </div>
         <form @submit=${onSubmit}>
@@ -43,7 +43,8 @@ export async function loginPage(ctx) {
         try {
 
             if (body.email == '' || body.password == '') {
-                return ctx.render(loginTemplate(onSubmit, body.email == '', body.password == '', "All fields must be filled!"));
+                notify("All fields must be filled!");
+                return ctx.render(loginTemplate(onSubmit, body.email == '', body.password == ''));
             }
 
             await login(body.email, body.password);
@@ -52,7 +53,7 @@ export async function loginPage(ctx) {
             ctx.page.redirect('/');
 
         } catch (error) {
-            alert(error.message);
+            notify(error.message);
         }
     }
 }
