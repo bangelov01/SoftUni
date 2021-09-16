@@ -100,7 +100,7 @@ ALTER TABLE [Users]
 ADD CONSTRAINT PK_User PRIMARY KEY (Id, [Username])
 
 ALTER TABLE [Users]
-ADD CHECK ([Password] >= 5)
+ADD CHECK (LEN([Password]) >= 5)
 
 ALTER TABLE [Users]
 ADD CONSTRAINT DF_LastLoginTime
@@ -283,3 +283,214 @@ INSERT INTO [RentalOrders] (EmployeeId, CustomerId, CarId, TankLevel, Kilometrag
 		(3, 2, 1, 'Full', 250000, 260000, '05.05.2020', '08.05.2020', '10%', 'Returned'),
 		(2, 1, 3, 'Empty', 230000, 260450, '05.05.2020', '08.05.2020', '15%', 'Returned'),
 		(1, 3, 2, 'Full', 300000, 360000, '05.05.2020', '08.05.2020', '10%', 'Not Returned')
+
+--Hotel db exercises
+
+CREATE DATABASE Hotel
+
+USE Hotel
+
+CREATE TABLE Employees (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	FirstName VARCHAR(30) NOT NULL,
+	LastName VARCHAR(30),
+	Title VARCHAR(30) NOT NULL,
+	Notes VARCHAR(MAX),
+)
+
+CREATE TABLE Customers (
+	AccountNumber BIGINT PRIMARY KEY NOT NULL,
+	FirstName VARCHAR(30) NOT NULL,
+	LastName VARCHAR(30) NOT NULL,
+	PhoneNumber INT,
+	EmergencyName VARCHAR(30) NOT NULL,
+	EmergencyNumber SMALLINT NOT NULL,
+	Notes VARCHAR(MAX),
+)
+
+CREATE TABLE RoomStatus (
+	RoomStatus INT PRIMARY KEY IDENTITY NOT NULL,
+	Notes VARCHAR(MAX)
+)
+
+CREATE TABLE RoomTypes (
+	RoomType INT PRIMARY KEY IDENTITY NOT NULL,
+	Notes VARCHAR(MAX)
+)
+
+CREATE TABLE BedTypes (
+	BedType INT PRIMARY KEY IDENTITY NOT NULL,
+	Notes VARCHAR(MAX)
+)
+
+CREATE TABLE Rooms (
+	RoomNumber INT PRIMARY KEY IDENTITY NOT NULL,
+	RoomType INT FOREIGN KEY REFERENCES RoomTypes(RoomType) NOT NULL,
+	BedType INT FOREIGN KEY REFERENCES BedTypes(BedType) NOT NULL,
+	Rate SMALLINT NOT NULL,
+	RoomStatus INT FOREIGN KEY REFERENCES RoomStatus(RoomStatus) NOT NULL,
+	Notes VARCHAR(MAX)
+)
+
+CREATE TABLE Payments (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	EmployeeId BIGINT FOREIGN KEY REFERENCES Employees(Id) NOT NULL,
+	PaymentDate DATETIME2 NOT NULL,
+	AccountNumber BIGINT FOREIGN KEY REFERENCES Customers(AccountNumber) NOT NULL,
+	FirstDateOccupied DATETIME2,
+	LastDateOccupied DATETIME2,
+	TotalDays SMALLINT NOT NULL,
+	AmountCharged DECIMAL(5,2) NOT NULL,
+	TaxRate NVARCHAR(10),
+	TaxAmount DECIMAL(5,2) NOT NULL,
+	PaymentTotal DECIMAL(5,2) NOT NULL,
+	Notes VARCHAR(MAX)
+)
+
+CREATE TABLE Occupancies (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	EmployeeId BIGINT FOREIGN KEY REFERENCES Employees(Id) NOT NULL,
+	DateOccupied DATETIME2 NOT NULL,
+	AccountNumber BIGINT FOREIGN KEY REFERENCES Customers(AccountNumber) NOT NULL,
+	RoomNumber INT FOREIGN KEY REFERENCES Rooms(RoomNumber) NOT NULL,
+	RateApplied SMALLINT,
+	PhoneCharge DECIMAL(5,2),
+	Notes VARCHAR(MAX)
+)
+
+INSERT INTO  Employees (FirstName, Title)
+	VALUES
+		('Gosho', 'Cleaner'),
+		('Pesho', 'FrontDesk'),
+		('Niki', 'Cook')
+
+INSERT INTO Customers (AccountNumber, FirstName, LastName, EmergencyName, EmergencyNumber)
+	VALUES
+		(111, 'Pesho', 'Goshev', 'P', 150),
+		(112, 'Mariika', 'Mariikova', 'M', 200),
+		(113, 'Zdravko', 'Jelqzkov', 'Zdr', 300)
+
+INSERT INTO RoomStatus (Notes)
+	VALUES
+		('Booked'),
+		('Occupied'),
+		('Free')
+
+INSERT INTO RoomTypes (Notes)
+	VALUES
+		('Single'),
+		('Double'),
+		('Apartment')
+
+INSERT INTO BedTypes (Notes)
+	VALUES
+		('Single Bed'),
+		('Double Bed'),
+		('King Size Bed')
+
+INSERT INTO Rooms (RoomType, BedType, Rate, RoomStatus)
+	VALUES
+		(2, 1, 80, 1),
+		(1, 3, 100, 2),
+		(3, 2, 250, 3)
+
+INSERT INTO Payments (EmployeeId, PaymentDate, AccountNumber, TotalDays, AmountCharged, TaxAmount, PaymentTotal)
+	VALUES
+		(1, '01.01.2021', 112, 2, 160.00, 10.00, 170.00),
+		(2, '02.02.2021', 111, 3, 200.00, 20.00, 220.00),
+		(3, '03.03.2021', 113, 5, 250.00, 15.00, 265.00)
+
+INSERT INTO Occupancies (EmployeeId, DateOccupied, AccountNumber, RoomNumber)
+	VALUES
+		(3, GETDATE(), 113, 2),
+		(1, '05.06.2020', 111, 1),
+		(2, '05.06.2021', 112, 3)
+
+--Softuni db exercises -- select
+
+CREATE DATABASE SoftUni
+
+USE SoftUni
+
+CREATE TABLE Towns (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	[Name] VARCHAR(30) NOT NULL 
+)
+
+CREATE TABLE Addresses (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	AddressText VARCHAR(30),
+	TownId BIGINT FOREIGN KEY REFERENCES Towns(Id)
+)
+
+CREATE TABLE Departments (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	[Name] VARCHAR(30) NOT NULL 
+)
+
+CREATE TABLE Employees (
+	Id BIGINT PRIMARY KEY IDENTITY NOT NULL,
+	FirstName VARCHAR(30) NOT NULL,
+	MiddleName VARCHAR(30),
+	LastName VARCHAR(30) NOT NULL,
+	JobTitle VARCHAR(30) NOT NULL,
+	DepartmentId BIGINT FOREIGN KEY REFERENCES Departments(Id) NOT NULL,
+	HireDate DATETIME2,
+	Salary DECIMAL(6,2) NOT NULL,
+	AddressId BIGINT FOREIGN KEY REFERENCES Addresses(Id) NOT NULL,
+)
+
+INSERT INTO Towns ([Name])
+	VALUES
+		('Veliko Tarnovo'),
+		('Sofia'),
+		('Varna')
+
+INSERT INTO Addresses(AddressText, TownId)
+	VALUES
+		('ul.Opulchenska', 2),
+		('ul.Prqka', 1),
+		('ul.Dulga', 3)
+
+INSERT INTO Departments([Name])
+	VALUES
+		('Sofia Dept'),
+		('Varna Dept'),
+		('VT Dept')
+
+INSERT INTO Employees (FirstName, LastName, JobTitle, DepartmentId, Salary, AddressId)
+	VALUES
+		('Gosho', 'Goshev', 'Junior .NET Developer', 2, 1500.00, 1),
+		('Pesho', 'Peshev', 'Senior .NET Developer', 1, 5000.00, 2),
+		('Niki', 'Nikov', 'Junior Front-End Developer', 3, 1300.00, 3)
+
+SELECT * FROM Towns
+ORDER BY [Name] ASC
+
+SELECT * FROM Departments
+ORDER BY [Name] ASC
+
+SELECT * FROM Employees
+ORDER BY Salary DESC
+
+
+
+SELECT [Name] FROM Towns
+ORDER BY [Name] ASC
+
+SELECT [Name] FROM Departments
+ORDER BY [Name] ASC
+
+SELECT FirstName, LastName, JobTitle, Salary FROM Employees
+ORDER BY Salary DESC
+
+
+UPDATE Employees
+SET Salary = Salary + (Salary * 0.10)
+SELECT Salary FROM Employees
+
+UPDATE Payments
+SET TaxRate = TaxRate - (TaxRate * 0.03)
+SELECT TaxRate FROM Payments
+
+DELETE FROM Occupancies
