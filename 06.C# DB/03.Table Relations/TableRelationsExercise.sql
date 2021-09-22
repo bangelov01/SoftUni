@@ -198,3 +198,57 @@ CREATE TABLE OrderItems (
 	CONSTRAINT FK_OrderItems_Items
 	FOREIGN KEY (ItemID) REFERENCES Items(ItemID)
 )
+
+-- CREATE UNIVERSITY DB
+
+CREATE DATABASE University
+
+USE University
+
+CREATE TABLE Majors (
+	MajorID INT PRIMARY KEY IDENTITY NOT NULL,
+	[Name] VARCHAR(30) NOT NULL,
+)
+
+CREATE TABLE Students (
+	StudentID INT PRIMARY KEY IDENTITY NOT NULL,
+	StudentNumber INT NOT NULL,
+	StudentName VARCHAR(50) NOT NULL,
+	MajorID INT FOREIGN KEY REFERENCES Majors(MajorID) NOT NULL
+)
+
+CREATE TABLE Payments (
+	PaymentID INT PRIMARY KEY IDENTITY NOT NULL,
+	PaymentDate DATETIME2 NOT NULL,
+	PaymentAmount DECIMAL (6,2) NOT NULL,
+	StudentID INT FOREIGN KEY REFERENCES Students(StudentID)
+)
+
+CREATE TABLE Subjects (
+	SubjectID INT PRIMARY KEY IDENTITY NOT NULL,
+	SubjectName VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE Agenda (
+	StudentID INT,
+	SubjectID INT,
+	CONSTRAINT PK_Agenda
+	PRIMARY KEY (StudentID, SubjectID),
+	CONSTRAINT FK_Student_Agenda
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+	CONSTRAINT FK_Subject_Agenda
+	FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID)
+)
+
+--SIMPLE JOIN
+
+USE [Geography]
+
+SELECT m.MountainRange
+	,p.PeakName
+	,p.Elevation
+FROM Mountains AS m
+	INNER JOIN Peaks AS p
+		ON m.Id = p.MountainId
+WHERE m.Id = 17
+ORDER BY p.Elevation DESC
