@@ -96,3 +96,50 @@ FROM Games
 WHERE DATEPART(YEAR, [Start]) = '2011' OR DATEPART(YEAR, [Start]) = '2012'
 ORDER BY [Start], [Name]
 
+SELECT Username
+	,RIGHT([Email], CHARINDEX('@', REVERSE([Email])) - 1) AS 'EmailProvider'
+FROM Users
+ORDER BY EmailProvider
+		,Username
+
+SELECT Username
+	,IpAddress
+FROM Users
+WHERE IpAddress LIKE '___.1%.%.___'
+ORDER BY Username ASC
+
+SELECT [Name] AS Game
+	,CASE
+		WHEN DATEPART(HOUR, [Start]) >= 0 AND DATEPART(HOUR, [Start]) < 12 THEN 'Morning'
+		WHEN DATEPART(HOUR, [Start]) >= 12 AND DATEPART(HOUR, [Start]) < 18 THEN 'Afternoon'
+		WHEN DATEPART(HOUR, [Start]) >= 18 AND DATEPART(HOUR, [Start]) < 24 THEN 'Evening'
+	END AS 'PartOfTheDay'
+	,CASE
+		WHEN [Duration] <= 3 THEN 'Extra Short'
+		WHEN [Duration] BETWEEN 4 AND 6 THEN 'Short'
+		WHEN [Duration] > 3 THEN 'Long'
+		WHEN [Duration] IS NULL THEN 'Extra Long'
+	END AS 'Duration'
+FROM Games
+ORDER BY Game, Duration
+
+CREATE TABLE Orders (
+	Id INT PRIMARY KEY IDENTITY NOT NULL
+	,ProductName VARCHAR(30) NOT NULL
+	,OrderDate DATETIME2 NOT NULL
+)
+
+INSERT INTO Orders (ProductName, OrderDate)
+	VALUES 
+		('Butter', '2016-09-19')
+		,('Milk', '2016-09-30')
+		,('Cheese', '2016-09-04')
+		,('Bread', '2015-12-20')
+		,('Tomatoes', '2015-12-30')
+
+
+SELECT ProductName
+	,OrderDate
+	,DATEADD(DAY, 3, OrderDate) AS PayDue
+	,DATEADD(MONTH, 1, OrderDate) AS DeliverDue
+FROM Orders
