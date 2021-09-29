@@ -196,29 +196,27 @@ ORDER BY HighestPeakElevation DESC
 		,LongestRiverLength DESC
 		,CountryName
 
-SELECT TOP (5) Country
+
+
+SELECT TOP (5) CountryName AS Country
 	,ISNULL(PeakName, '(no highest peak)') AS HighestPeakName
-	,ISNULL(HighestPeakElevation, 0) AS HighestPeakElevation
+	,ISNULL(Elevation, 0) AS HighestPeakElevation
 	,ISNULL(MountainRange, '(no mountain)') AS Mountain
 FROM
-	(SELECT CountryName AS Country
-		,PeakName
-		,HighestPeakElevation
-		,MountainRange
-		,DENSE_RANK() OVER (PARTITION BY CountryName ORDER BY HighestPeakElevation DESC) AS HRank
+	(SELECT *
+		,DENSE_RANK() OVER (PARTITION BY CountryName ORDER BY Elevation DESC) AS HRank
 	FROM
 		(SELECT CountryName
 			,PeakName
 			,MountainRange
-			,MAX(p.Elevation) AS HighestPeakElevation
+			,Elevation
 		FROM Countries AS c
 			LEFT JOIN MountainsCountries AS mc
 			ON c.CountryCode = mc.CountryCode
 			LEFT JOIN Mountains AS m
 			ON mc.MountainId = m.Id
 			LEFT JOIN Peaks AS p
-			ON m.Id = p.MountainId
-		GROUP BY CountryName, PeakName, MountainRange) AS HighestPeakQuerry
+			ON m.Id = p.MountainId) AS HighestPeakQuerry
 	) AS RankingQuerry
 WHERE HRank = 1
 ORDER BY Country
