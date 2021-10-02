@@ -88,22 +88,74 @@ FROM
 USE SoftUni
 GO
 
-SELECT d.DepartmentID
-	,SUM(e.Salary) AS TotalSalary
-FROM Departments AS d
-	LEFT JOIN Employees AS e
-	ON d.DepartmentID = e.DepartmentID
-GROUP BY d.DepartmentID
-ORDER BY d.DepartmentID
 
-SELECT d.DepartmentID
-	,MIN(e.Salary) AS MinimumSalary
-FROM Departments AS d
-	LEFT JOIN Employees AS e
-	ON d.DepartmentID = e.DepartmentID
-WHERE e.HireDate > '2000-01-01'
-GROUP BY d.DepartmentID
-HAVING d.DepartmentID IN (2, 5, 7)
+SELECT DepartmentID
+	,SUM(Salary) AS TotalSalary
+FROM Employees 
+GROUP BY DepartmentID
+ORDER BY DepartmentID
+
+SELECT DepartmentID
+	,MIN(Salary) AS MinimumSalary
+FROM Employees
+WHERE HireDate > '2000-01-01'
+GROUP BY DepartmentID
+HAVING DepartmentID IN (2, 5, 7)
+
+
+SELECT *
+INTO Employees2
+FROM Employees
+WHERE Salary > 30000
+
+DELETE FROM Employees2
+WHERE ManagerID = 42
+
+UPDATE Employees2
+SET Salary += 5000
+WHERE DepartmentID = 1
+
+SELECT DepartmentID
+	,AVG(Salary) AS AverageSalary
+FROM Employees2
+GROUP BY DepartmentID
+
+SELECT DepartmentID
+	,MAX(Salary) AS MaxSalary
+FROM Employees
+GROUP BY DepartmentID
+HAVING MAX(Salary) NOT BETWEEN 30000 AND 70000
+
+SELECT COUNT(*) AS [Count]
+FROM Employees
+WHERE ManagerID IS NULL
+
+
+SELECT DepartmentID
+	,Salary AS ThirdHighestSalary
+FROM
+	(SELECT DepartmentID
+		,Salary
+		,DENSE_RANK() OVER (PARTITION BY DepartmentID ORDER BY Salary DESC) AS [Rank]
+	FROM Employees
+	GROUP BY DepartmentID, Salary) AS Ranking
+WHERE [Rank] = 3
+
+SELECT TOP (10) e.FirstName
+	,e.LastName
+	,e.DepartmentID
+FROM Employees AS e
+	,(SELECT DepartmentID
+			,AVG(Salary) AS AverageSalary
+		FROM Employees
+		GROUP BY DepartmentID) AS d
+WHERE (e.DepartmentID = d.DepartmentID) AND
+	e.Salary > d.AverageSalary
+ORDER BY e.DepartmentID
+
+
+
+
 
 
 
