@@ -80,3 +80,118 @@ BEGIN
 	RETURN @result
 END
 GO
+
+CREATE PROC usp_DeleteEmployeesFromDepartment (@departmentId INT)
+AS
+BEGIN
+
+	DELETE FROM EmployeesProjects
+	WHERE EmployeeID IN (
+							SELECT EmployeeID
+							FROM Employees
+							WHERE DepartmentID = @departmentId
+	)
+
+	UPDATE Employees
+	SET ManagerID = NULL
+	WHERE ManagerID IN (
+							SELECT EmployeeID
+							FROM Employees
+							WHERE DepartmentID = @departmentId
+	)
+
+	ALTER TABLE Departments
+	ALTER COLUMN ManagerID INT
+
+	UPDATE Departments
+	SET ManagerID = NULL
+	WHERE ManagerID IN (
+							SELECT EmployeeID
+							FROM Employees
+							WHERE DepartmentID = @departmentId
+	)
+
+	DELETE FROM Employees
+	WHERE DepartmentID = @departmentId
+
+	DELETE FROM Departments
+	WHERE DepartmentID = @departmentId
+
+	SELECT COUNT(*) FROM Employees
+	WHERE DepartmentID = @departmentId
+END
+GO
+
+
+USE [Bank]
+GO
+
+CREATE PROC usp_GetHoldersFullName
+AS
+BEGIN
+	SELECT CONCAT(FirstName, ' ', LastName) AS [Full Name]
+	FROM AccountHolders
+END
+GO
+
+
+CREATE PROC usp_GetHoldersWithBalanceHigherThan (@number DECIMAL(18,4))
+AS
+BEGIN
+		SELECT FirstName
+			,LastName
+		FROM Accounts AS a
+			JOIN AccountHolders AS ah
+			ON a.AccountHolderId = ah.Id
+		GROUP BY FirstName, LastName
+		HAVING SUM(Balance) > @number
+		ORDER BY FirstName, LastName
+END
+GO
+
+CREATE FUNCTION ufn_CalculateFutureValue (@sum DECIMAL(18,4), @yearlyRate FLOAT, @numberOfYears INT)
+RETURNS DECIMAL (18,4)
+AS
+BEGIN
+	DECLARE @futureValue DECIMAL (18,4)
+	SET @futureValue = @sum * (POWER((1 + @yearlyRate), @numberOfYears))
+
+	RETURN @futureValue
+END
+GO
+
+CREATE PROC usp_CalculateFutureValueForAccount (@accountID INT, @interestRate FLOAT)
+AS
+BEGIN
+	SELECT a.Id AS [Account Id]
+		,ah.FirstName AS [First Name]
+		,ah.LastName AS [Last Name]
+		,a.Balance AS CurrentBalance
+		,dbo.ufn_CalculateFutureValue(a.Balance, @interestRate, 5) AS [Balance in 5 years]
+	FROM Accounts AS a
+	JOIN AccountHolders AS ah
+	ON a.AccountHolderId = ah.Id
+	WHERE a.Id = @accountID
+END
+GO
+
+USE Diablo
+GO
+
+CREATE FUNCTION ufn_CashInUsersGames (@gameName NVARCHAR(50))
+RETURNS TABLE
+AS 
+RETURN 
+SELECT(
+				SELECT
+					SUM(Cash)
+				FROM
+							(SELECT g.[Name]
+								,ug.Cash
+								,ROW_NUMBER() OVER(PARTITION BY g.[Name] ORDER BY ug.Cash DESC) AS [Row]
+							FROM UsersGames AS ug
+							JOIN Games AS g
+							ON ug.GameId = g.Id
+							WHERE g.[Name] = @gameName) AS RowQuerry
+				WHERE [Row] % 2 = 1
+		) AS SumCash
