@@ -33,5 +33,23 @@ namespace _03.MoreExercises
         public static string INSERT_MINION_WITH_NAME_AGE_TOWNID = @"INSERT INTO Minions ([Name], Age, TownId) VALUES (@name, @age, @townId)";
 
         public static string INSERT_DEPENDANCY_MINION_VILLAIN = @"INSERT INTO MinionsVillains (MinionId, VillainId) VALUES (@minionId, @villainId)";
+
+        public static string GET_TOWNS_FOR_COUNTRY_BY_NAME = @"
+            SELECT t.[Name]
+                FROM Towns as t
+                JOIN Countries AS c 
+                ON c.Id = t.CountryCode
+            WHERE c.[Name] = @countryName";
+
+        public static string UPDATE_TOWNS_NAMES = @"
+            UPDATE Towns
+            SET [Name] = UPPER([Name])
+            WHERE CountryCode = (SELECT c.Id 
+                                    FROM Countries AS c 
+                                    WHERE c.[Name] = @countryName)";
+
+        public static string GET_ALL_MINIONS_NAMES = @"
+            SELECT [Name]
+            FROM Minions";
     }
 }

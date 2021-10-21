@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,8 +16,10 @@ namespace _03.MoreExercises
 
             await using (dbConnection)
             {
-                await MinionNamesExercise(dbConnection);
-                await AddMinionExercise(dbConnection);
+                //await MinionNamesExercise(dbConnection);
+                //await AddMinionExercise(dbConnection);
+                //await ChangeTownNamesExercise(dbConnection);
+                await PrintAllMinionNamesInOrder(dbConnection);
             }
 
             //Double check connection
@@ -164,6 +167,93 @@ namespace _03.MoreExercises
             await dependancyCmd.ExecuteNonQueryAsync();
 
             Console.WriteLine($"Successfully added {minionName} to be minion of {villainName}.");
+        }
+
+        //Change Town Names Exercise
+        private static async Task ChangeTownNamesExercise(SqlConnection connection)
+        {
+            Console.WriteLine("Exercise Three: Please enter country name!");
+            string countryName = Console.ReadLine().Trim();
+
+            await ManageTowns(connection, countryName);
+        }
+
+        private static async Task ManageTowns (SqlConnection connection, string countryName)
+        {
+            List<string> townsToChange = new List<string>();
+
+            SqlCommand getTownsCommand = new SqlCommand(Querries.GET_TOWNS_FOR_COUNTRY_BY_NAME, connection);
+            getTownsCommand.Parameters.AddWithValue("@countryName", countryName);
+
+            SqlDataReader reader = await getTownsCommand.ExecuteReaderAsync();
+
+            await using (reader)
+            {
+                if (await reader.ReadAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string townName = (string)reader["Name"];
+                        townsToChange.Add(townName);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No town names were affected.");
+                    return;
+                }
+            }
+
+            SqlCommand updateTownCmd = new SqlCommand(Querries.UPDATE_TOWNS_NAMES, connection);
+            updateTownCmd.Parameters.AddWithValue("@countryName",countryName);
+            await updateTownCmd.ExecuteNonQueryAsync();
+
+            townsToChange = townsToChange.ConvertAll(t => t.ToUpper());
+            Console.WriteLine($"{townsToChange.Count} town names were affected.\r\n[{string.Join(',', townsToChange)}]");
+        }
+
+        //Print All Minion Names Exercise
+
+        private static async Task PrintAllMinionNamesInOrder(SqlConnection connection)
+        {
+
+            List<string> namesList = new List<string>();
+
+            SqlCommand getNames = new SqlCommand(Querries.GET_ALL_MINIONS_NAMES, connection);
+
+            SqlDataReader reader = await getNames.ExecuteReaderAsync();
+
+            await using (reader)
+            {
+                while (await reader.ReadAsync())
+                {
+                    string name = (string)reader["Name"];
+
+                    namesList.Add(name);
+                }
+            }
+
+            List<string> finalOrder = new List<string>();
+
+            int index = 0;
+
+            while (finalOrder.Count < namesList.Count)
+            {
+                string first = namesList[0 + index];
+                string last = namesList[(namesList.Count - 1) - index];
+
+                if (first == last)
+                {
+                    finalOrder.Add(first);
+                    break;
+                }
+
+                finalOrder.Add(first);
+                finalOrder.Add(last);
+                index++;
+            }
+
+            Console.WriteLine(string.Join(",", finalOrder));
         }
     }
 }
