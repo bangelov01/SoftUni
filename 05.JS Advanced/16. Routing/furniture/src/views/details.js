@@ -23,7 +23,7 @@ const detailsTemplate = (item, isOwner, onDelete) => html`
                 <p>Description: <span>${item.description}</span></p>
                 <p>Price: <span>${item.price}</span></p>
                 <p>Material: <span>${item.material}</span></p>
-                <div style=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx>
+                <div style=${isOwner ? "display:inline-block" : "display:none"}>
                     <a href=${`/edit/${item._id}`} class="btn btn-info">Edit</a>
                     <a @click=${onDelete} href="javascript:void(0)" class="btn btn-red">Delete</a>
                 </div>
