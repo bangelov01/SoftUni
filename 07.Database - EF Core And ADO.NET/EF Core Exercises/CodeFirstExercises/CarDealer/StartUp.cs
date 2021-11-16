@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using CarDealer.Data;
-using CarDealer.DTO.Export;
-using CarDealer.DTO.Import;
-using CarDealer.Models;
+
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+
+using CarDealer.Data;
+using CarDealer.DTO.Export;
+using CarDealer.DTO.Export.CarsWithListOfPartsDtos;
+using CarDealer.DTO.Import;
+using CarDealer.Models;
+using CarDealer.DTO.Export.SalesWithDiscountDtos;
 
 namespace CarDealer
 {
@@ -38,7 +42,10 @@ namespace CarDealer
 
             //Console.WriteLine(GetOrderedCustomers(context));
             //Console.WriteLine(GetCarsFromMakeToyota(context));
-            Console.WriteLine(GetLocalSuppliers(context));
+            //Console.WriteLine(GetLocalSuppliers(context));
+            //Console.WriteLine(GetCarsWithTheirListOfParts(context));
+            //Console.WriteLine(GetTotalSalesByCustomer(context));
+            Console.WriteLine(GetSalesWithAppliedDiscount(context));
         }
 
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
@@ -184,6 +191,84 @@ namespace CarDealer
             };
 
             return JsonConvert.SerializeObject(localSuppliers, jsonSettings);
+        }
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var carsWithParts = context.Cars
+                .Include(c => c.PartCars)
+                .Select(c => new CarsWithPartsListDto
+                {
+                    Car = new CarDto
+                    {
+                        Make = c.Make,
+                        Model = c.Model,
+                        TravelledDistance = c.TravelledDistance
+                    },
+                    Parts = c.PartCars.Select(pc => new PartDto
+                    {
+                        Name = pc.Part.Name,
+                        Price = pc.Part.Price.ToString("f2")
+                    }).ToArray()
+
+                }).ToArray();
+
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
+            return JsonConvert.SerializeObject(carsWithParts, jsonSettings);
+        }
+
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var mapper = InitializeMapper();
+
+            var salesByCustomer = context.Customers
+                .Where(c => c.Sales.Count >= 1)
+                .ProjectTo<CustomersTotalSalesDto>(mapper.ConfigurationProvider)
+                .OrderByDescending(c => c.SpentMoney)
+                .ThenByDescending(c => c.BoughtCars)
+                .ToList();
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                },
+                NullValueHandling = NullValueHandling.Ignore
+            };
+
+            return JsonConvert.SerializeObject(salesByCustomer, jsonSettings);
+        }
+
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var salesWithDiscount = context.Sales
+                .Take(10)
+                .Select(s => new SaleWithDiscountDto
+                {
+                    Car = new CarDto
+                    {
+                        Make = s.Car.Make,
+                        Model = s.Car.Model,
+                        TravelledDistance = s.Car.TravelledDistance
+                    },
+                    CustomerName = s.Customer.Name,
+                    Discount = s.Discount.ToString("f2"),
+                    Price = s.Car.PartCars.Sum(pc => pc.Part.Price).ToString("f2"),
+                }).ToArray();
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
+            return JsonConvert.SerializeObject(salesWithDiscount, jsonSettings);
         }
 
         public static IMapper InitializeMapper()
