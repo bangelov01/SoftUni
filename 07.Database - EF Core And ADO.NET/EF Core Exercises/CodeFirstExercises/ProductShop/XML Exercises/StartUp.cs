@@ -10,8 +10,11 @@ using ProductShop.Dtos.Import;
 using ProductShop.Models;
 using ProductShop.Dtos.Export;
 using ProductShop.Dtos.Export.SoldProductDtos;
+using ProductShop.Dtos.Export.UsersAndProductsDtos;
 
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductShop
 {
@@ -33,7 +36,9 @@ namespace ProductShop
             //Console.WriteLine(ImportCategories(context, inputFromXmlCategory));
             //Console.WriteLine(ImportCategoryProducts(context, inputFromXmlCategoryProduct));
             //Console.WriteLine(GetProductsInRange(context));
-            Console.WriteLine(GetSoldProducts(context));
+            //Console.WriteLine(GetSoldProducts(context));
+            //Console.WriteLine(GetCategoriesByProductsCount(context));
+            Console.WriteLine(GetUsersWithProducts(context));
         }
 
         public static string ImportUsers(ProductShopContext context, string inputXml)
@@ -187,10 +192,85 @@ namespace ProductShop
 
         }
 
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var mapper = InitializeMapper();
+
+            var categories = context.Categories
+                .Include(x => x.CategoryProducts)
+                .ProjectTo<ExportCategoryByProductDto>(mapper.ConfigurationProvider)
+                .OrderByDescending(c => c.ProductsCount)
+                .ThenBy(c => c.TotalRevenue)
+                .ToArray();
+
+            var serializer = GetSerializer("Categories", typeof(ExportCategoryByProductDto[]));
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(String.Empty, String.Empty);
+
+            var sb = new StringBuilder();
+
+            using (var writer = new StringWriter(sb))
+            {
+                serializer.Serialize(writer, categories, namespaces);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var usersWithProducts = context.Users
+                .Include(x => x.ProductsSold)
+                .ToArray()
+                .Where(u => u.ProductsSold.Count >= 1)
+                .Select(u => new UsersAndProductsDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Age = u.Age,
+                    SoldProducts = new SoldProductDto
+                    {
+                        Count = u.ProductsSold.Count,
+                        Products = u.ProductsSold.Select(ps => new UAPProductDto
+                        {
+                            Name = ps.Name,
+                            Price = ps.Price
+                        })
+                        .OrderByDescending(x => x.Price)
+                        .ToArray()
+                    }
+                })
+                .OrderByDescending(x => x.SoldProducts.Count)
+                .Take(10)
+                .ToArray();
+
+            var exportObj = new ExportUsersAndProductsDto
+            {
+                UsersCount = context.Users.Where(u => u.ProductsSold.Count >= 1).Count(),
+                Users = usersWithProducts
+            };
+
+            var serializer = GetSerializer("Users", typeof(ExportUsersAndProductsDto));
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(String.Empty, String.Empty);
+
+            var sb = new StringBuilder();
+
+            using (var writer = new StringWriter(sb))
+            {
+                serializer.Serialize(writer, exportObj, namespaces);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
         public static XmlSerializer GetSerializer (string root, Type dtoType)
         {
             return new XmlSerializer(dtoType, new XmlRootAttribute(root));
         }
+
 
         public static IMapper InitializeMapper()
         {
