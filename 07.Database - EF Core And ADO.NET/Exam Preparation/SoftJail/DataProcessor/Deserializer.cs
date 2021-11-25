@@ -4,12 +4,16 @@
     using Data;
     using Newtonsoft.Json;
     using SoftJail.Data.Models;
+    using SoftJail.Data.Models.Enums;
     using SoftJail.DataProcessor.ImportDto;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Xml.Serialization;
 
     public class Deserializer
     {
@@ -59,17 +63,121 @@
             }
 
             context.Departments.AddRange(filteredDepartments);
+            context.SaveChanges();
+
             return sb.ToString().TrimEnd();
         }
 
         public static string ImportPrisonersMails(SoftJailDbContext context, string jsonString)
         {
-            throw new NotImplementedException();
+            var desPrisonersMails= JsonConvert.DeserializeObject<IEnumerable<ImportPrisonersAndMailsDTO>>(jsonString);
+
+            var filteredPrisoners = new HashSet<Prisoner>();
+            var sb = new StringBuilder();
+
+            foreach (var prisoner in desPrisonersMails)
+            {
+                var mails = new HashSet<Mail>();
+
+                bool isMailValid = true;
+
+                foreach (var mail in prisoner.Mails)
+                {
+                    if (!IsValid(mail))
+                    {
+                        isMailValid = false;
+                        break;
+                    }
+
+                    mails.Add(new Mail
+                    {
+                        Description = mail.Description,
+                        Sender = mail.Sender,
+                        Address = mail.Address
+                    });
+                }
+
+                if (!IsValid(prisoner) || !isMailValid)
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+
+                var validPrisoner = new Prisoner
+                {
+                    FullName = prisoner.FullName,
+                    Nickname = prisoner.Nickname,
+                    Age = prisoner.Age,
+                    IncarcerationDate = DateTime.ParseExact(prisoner.IncarcerationDate, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                    ReleaseDate = string.IsNullOrEmpty(prisoner.ReleaseDate) ? (DateTime?)null : DateTime.ParseExact(prisoner.ReleaseDate, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                    Bail = prisoner.Bail,
+                    Mails = mails
+                };
+
+                filteredPrisoners.Add(validPrisoner);
+                sb.AppendLine($"Imported {validPrisoner.FullName} {validPrisoner.Age} years old");
+            }
+
+            context.Prisoners.AddRange(filteredPrisoners);
+            context.SaveChanges();
+
+            return sb.ToString().TrimEnd();
         }
 
         public static string ImportOfficersPrisoners(SoftJailDbContext context, string xmlString)
         {
-            throw new NotImplementedException();
+            var serializer = GetSerializer("Officers", typeof(ImportOfficersAndPrisonersDTO[]));
+
+            var deserializedOfficers = (ImportOfficersAndPrisonersDTO[])serializer.Deserialize(new StringReader(xmlString));
+
+            var validatedOfficers = new HashSet<Officer>();
+
+            var sb = new StringBuilder();
+
+            foreach (var off in deserializedOfficers)
+            {
+                Weapon weaponValue;
+                Position positionValue;
+
+                var weapon = Enum.TryParse(off.Weapon, out weaponValue);
+                var position = Enum.TryParse(off.Position, out positionValue);
+
+                if (!IsValid(off) || !weapon || !position)
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+
+                var validOfficer = new Officer
+                {
+                    FullName = off.FullName,
+                    Salary = off.Salary,
+                    Position = positionValue,
+                    Weapon = weaponValue,
+                    DepartmentId = off.DepartmentId
+                };
+
+                foreach (var prisonerId in off.Prisoners.Select(p => p.Id))
+                {
+                    validOfficer.OfficerPrisoners.Add(new OfficerPrisoner
+                    {
+                        PrisonerId = prisonerId,
+                        Officer = validOfficer
+                    });
+                };
+
+                validatedOfficers.Add(validOfficer);
+                sb.AppendLine($"Imported {validOfficer.FullName} ({validOfficer.OfficerPrisoners.Count} prisoners)");
+            }
+
+            context.Officers.AddRange(validatedOfficers);
+            context.SaveChanges();
+            return sb.ToString().TrimEnd();
+        }
+
+        public static XmlSerializer GetSerializer(string root, Type dtoType)
+        {
+            return new XmlSerializer(dtoType, new XmlRootAttribute(root));
         }
 
         private static bool IsValid(object obj)
