@@ -19,5 +19,7 @@ namespace SoftJail.DataProcessor.ImportDto
         [Range(typeof(decimal), "0", "79228162514264337593543950335")]
         public decimal? Bail { get; set; }
         public virtual IEnumerable<MailDTO> Mails { get; set; }
+
+        public int? CellId { get; set; }
     }
 }

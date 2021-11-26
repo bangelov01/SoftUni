@@ -111,7 +111,8 @@
                     IncarcerationDate = DateTime.ParseExact(prisoner.IncarcerationDate, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                     ReleaseDate = string.IsNullOrEmpty(prisoner.ReleaseDate) ? (DateTime?)null : DateTime.ParseExact(prisoner.ReleaseDate, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                     Bail = prisoner.Bail,
-                    Mails = mails
+                    Mails = mails,
+                    CellId = prisoner.CellId
                 };
 
                 filteredPrisoners.Add(validPrisoner);
