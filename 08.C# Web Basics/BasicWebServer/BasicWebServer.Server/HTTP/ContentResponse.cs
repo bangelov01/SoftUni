@@ -5,11 +5,14 @@ namespace BasicWebServer.Server.HTTP
 {
     public class ContentResponse : Response
     {
-        public ContentResponse(string content, string contentType) 
+        public ContentResponse(string content, string contentType,
+            Action<Request, Response> preRenderAction = null) 
             : base(StatusCode.OK)
         {
             NullValidator.Validate(content);
             NullValidator.Validate(contentType);
+
+            this.PreRenderAction = preRenderAction;
 
             this.Headers.Add(Header.ContentType, contentType);
 
