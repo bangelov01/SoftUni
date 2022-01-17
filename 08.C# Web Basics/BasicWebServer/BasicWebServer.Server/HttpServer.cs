@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using BasicWebServer.Server.HTTP;
+using BasicWebServer.Server.Routing;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -10,12 +12,30 @@ namespace BasicWebServer.Server
         private readonly int port;
         private readonly TcpListener serverListener;
 
-        public HttpServer(string ipAddress, int port)
+        private readonly RoutingTable routingTable;
+
+        public HttpServer(string ipAddress, 
+            int port, 
+            Action<IRoutingTable> routingTableConfig)
         {
             this.ipAddress = IPAddress.Parse(ipAddress);
             this.port = port;
 
             this.serverListener = new TcpListener(this.ipAddress, this.port);
+
+            routingTableConfig(this.routingTable = new RoutingTable());
+        }
+
+        public HttpServer(int port, Action<IRoutingTable> routingTable)
+            : this("127.0.0.1", port, routingTable)
+        {
+
+        }
+
+        public HttpServer(Action<IRoutingTable> routingTable)
+            : this(8080, routingTable)
+        {
+
         }
 
         public void Start()
@@ -31,27 +51,25 @@ namespace BasicWebServer.Server
 
                 var networkStream = connection.GetStream();
 
-                WriteResponse(networkStream, "Hello from the Server!");
+                //WriteResponse(networkStream, "Hello from the Server!");
 
                 var requestText = this.ReadRequest(networkStream);
 
                 Console.WriteLine(requestText);
 
+                var request = Request.Parse(requestText);
+
+                var response = this.routingTable.MatchRequest(request);
+
+                WriteResponse(networkStream, response);
+
                 connection.Close();
             }
         }
 
-        private void WriteResponse(NetworkStream networkStream, string content)
+        private void WriteResponse(NetworkStream networkStream, Response response)
         {
-            var contentLength = Encoding.UTF8.GetByteCount(content);
-
-            var response = $@"HTTP/1.1 200 OK 
-Content-Type: text/plain; charset=UTF-8 
-Content-Length: {contentLength} 
-
-{content}";
-
-            var responseBytes = Encoding.UTF8.GetBytes(response);
+            var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
 
             networkStream.Write(responseBytes);
         }
@@ -69,7 +87,7 @@ Content-Length: {contentLength}
             {
                 var bytesRead = networkStream.Read(buffer, 0, bufferLength);
                 Thread.Sleep(1); //Force the loop to a halt as there can be delayed packets.
-                                 //Not the best solutuon.
+                                 //Not the best solutuon. Only for testing.
 
                 totalBytes += bytesRead;
 
