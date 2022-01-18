@@ -12,7 +12,7 @@ namespace BasicWebServer.Main
 <input type='submit' value ='Save' />
 </form>";
 
-        public static void Main()
+        public static async Task Main()
         {
             var server = new HttpServer(routes => routes
                     .MapGet("/", new TextResponse("Hello from the server!"))
@@ -20,7 +20,7 @@ namespace BasicWebServer.Main
                     .MapGet("/Redirect", new RedirectResponse("https://softuni.org/"))
                     .MapPost("/HTML", new TextResponse("", AddFormDataAction)));
 
-            server.Start();
+            await server.Start();
         }
 
         private static void AddFormDataAction(Request request, Response response)
