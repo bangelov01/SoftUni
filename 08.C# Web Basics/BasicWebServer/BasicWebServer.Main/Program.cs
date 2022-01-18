@@ -12,13 +12,23 @@ namespace BasicWebServer.Main
 <input type='submit' value ='Save' />
 </form>";
 
+        private const string DownloadForm = @"<form action='/Content' method='POST'>
+   <input type='submit' value ='Download Sites Content' /> 
+</form>";
+
+        private const string FileName = "content.txt";
+
         public static async Task Main()
         {
+            await DownloadSitesAsTextFile(FileName, new string[] { "https://softuni.org/", "https://judge.softuni.org/" });
+
             var server = new HttpServer(routes => routes
                     .MapGet("/", new TextResponse("Hello from the server!"))
                     .MapGet("/HTML", new HtmlResponse(HtmlForm))
                     .MapGet("/Redirect", new RedirectResponse("https://softuni.org/"))
-                    .MapPost("/HTML", new TextResponse("", AddFormDataAction)));
+                    .MapPost("/HTML", new TextResponse("", AddFormDataAction))
+                    .MapGet("/Content", new HtmlResponse(DownloadForm))
+                    .MapPost("/Content", new TextFileResponse(FileName)));
 
             await server.Start();
         }
@@ -32,6 +42,36 @@ namespace BasicWebServer.Main
                 response.Body += $"{key} - {value}";
                 response.Body += Environment.NewLine;
             }
+        }
+
+        private static async Task<string> DownloadWebsiteContent(string url)
+        {
+            var httpClient = new HttpClient();
+
+            using (httpClient)
+            {
+                var response = await httpClient.GetAsync(url);
+
+                var html = await response.Content.ReadAsStringAsync();
+
+                return html.Substring(0, 2000);
+            }
+        }
+
+        private static async Task DownloadSitesAsTextFile(string fileName, string[] urls)
+        {
+            var downloads = new List<Task<string>>();
+
+            foreach (var url in urls)
+            {
+                downloads.Add(DownloadWebsiteContent(url));
+            }
+
+            var responses = await Task.WhenAll(downloads);
+
+            var responseString = string.Join(Environment.NewLine + new String('-', 100), responses);
+
+            await File.AppendAllTextAsync(fileName, responseString);
         }
     }
 }
