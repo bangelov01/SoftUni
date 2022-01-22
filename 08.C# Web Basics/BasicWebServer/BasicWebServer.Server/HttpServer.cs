@@ -71,6 +71,7 @@ namespace BasicWebServer.Server
                     await WriteResponse(networkStream, response);
 
                     connection.Close();
+                
                 });
 
             }
