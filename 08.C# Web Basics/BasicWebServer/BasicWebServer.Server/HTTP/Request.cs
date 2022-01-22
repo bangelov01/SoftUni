@@ -12,7 +12,11 @@ namespace BasicWebServer.Server.HTTP
 
         public CookieCollection Cookies { get; private set; }
 
+        private static Dictionary<string, Session> Sessions = new();
+
         public string Body { get; private set; }
+
+        public Session Session { get; private set; }
 
         public IReadOnlyDictionary<string, string> Form { get; private set; }
 
@@ -29,6 +33,8 @@ namespace BasicWebServer.Server.HTTP
 
             var cookies = ParseCookies(headers);
 
+            var session = GetSession(cookies);
+
             var bodyLines = lines.Skip(headers.Count + 2).ToArray();
 
             string body = string.Join("\r\n", bodyLines);
@@ -42,8 +48,23 @@ namespace BasicWebServer.Server.HTTP
                 Headers = headers,
                 Cookies = cookies,
                 Body = body,
+                Session = session,
                 Form = form
             };
+        }
+
+        private static Session GetSession(CookieCollection cookies)
+        {
+            var sessionId = cookies.Contains(Session.SessionCookieName)
+                ? cookies[Session.SessionCookieName]
+                : Guid.NewGuid().ToString();
+
+            if (!Sessions.ContainsKey(sessionId))
+            {
+                Sessions[sessionId] = new Session(sessionId);
+            }
+
+            return Sessions[sessionId];
         }
 
         private static CookieCollection ParseCookies(HeaderCollection headers)
