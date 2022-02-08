@@ -31,8 +31,8 @@
                 OwnerId = ownerId
             };
 
-            dbContext.Cars.AddAsync(car);
-            dbContext.SaveChangesAsync();
+            dbContext.Cars.Add(car);
+            dbContext.SaveChanges();
         }
 
         public List<CarListingViewModel> GetCarsWithIssues()

@@ -25,7 +25,7 @@
         {
             if (userService.IsUserMechanic(this.User.Id))
             {
-                return Unauthorized();
+                return Error("A mechanic can not add a car!");
             }
 
             return View();

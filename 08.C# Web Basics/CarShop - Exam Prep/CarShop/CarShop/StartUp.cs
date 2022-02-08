@@ -21,11 +21,10 @@
                 .Add<IValidator, Validator>()
                 .Add<IUserService, UserService>()
                 .Add<ICarService, CarService>()
+                .Add<IIssueService, IssueService>()
                 .Add<IPasswordHasher, PasswordHasher>())
                 .WithConfiguration<ApplicationDbContext>(context => context
                     .Database.Migrate())
                 .Start();
     }
-
-    //TODO ISSUES
 }
