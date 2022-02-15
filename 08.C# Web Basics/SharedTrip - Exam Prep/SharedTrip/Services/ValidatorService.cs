@@ -86,6 +86,38 @@
             return errors;
         }
 
+        public bool AreTripSeatsFree(string tripId)
+        {
+            var seatNumber = dbContext
+                                .Trips
+                                .Find(tripId)
+                                .Seats;
+
+            if (seatNumber < 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool IsUserAlreadyInTrip(string tripId,
+            string userId)
+        {
+            var userTrip = dbContext
+                         .UsersTrips
+                         .Where(t => t.UserId == userId 
+                                  && t.TripId == tripId)
+                         .FirstOrDefault();
+
+            if (userTrip == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public ICollection<ErrorViewModel> ValidateUserRegistration(RegisterUserFormModel model)
         {
             var errors = new List<ErrorViewModel>();

@@ -33,7 +33,7 @@
 
             if (modelErrors.Any())
             {
-                return View(modelErrors, "/Error");
+                return View(modelErrors, "/Errors");
             }
 
             var concreteError = new ErrorViewModel();
@@ -78,6 +78,14 @@
             this.SignIn(userId);
 
             return Redirect("/Trips/All");
+        }
+
+        [Authorize]
+        public Response Logout()
+        {
+            this.SignOut();
+
+            return Redirect("/");
         }
     }
 }

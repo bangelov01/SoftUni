@@ -10,5 +10,7 @@
         void AddTrip(TripListingFormModel model);
 
         TripDetailsViewModel GetTripById(string Id);
+
+        void AddUserToTrip(string tripId, string userId);
     }
 }

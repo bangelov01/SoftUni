@@ -94,11 +94,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Views\Error.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BasicWebServer.Server\BasicWebServer.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\Error.cshtml">
+    <Content Update="Views\Errors.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

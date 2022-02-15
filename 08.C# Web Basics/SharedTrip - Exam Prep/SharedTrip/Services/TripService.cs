@@ -34,6 +34,24 @@
             dbContext.SaveChanges();
         }
 
+        public void AddUserToTrip(string tripId, string userId)
+        {
+            var trip = dbContext
+                    .Trips
+                    .Find(tripId);
+
+            trip.Seats -= 1;
+
+            var tripUser = new UserTrip
+            {
+                TripId = tripId,
+                UserId = userId
+            };
+
+            dbContext.UsersTrips.Add(tripUser);
+            dbContext.SaveChanges();
+        }
+
         public ICollection<TripViewModel> GetAllTrips()
         {
             return dbContext

@@ -13,5 +13,9 @@
         bool IsEmailAvailable(string email);
 
         bool IsUsernameAvailable(string username);
+
+        bool AreTripSeatsFree(string tripId);
+
+        bool IsUserAlreadyInTrip(string tripId, string userId);
     }
 }
