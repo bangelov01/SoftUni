@@ -4,6 +4,7 @@
     using BasicWebServer.Server.Routing;
     using SharedTrip.Contracts;
     using SharedTrip.Data;
+    using SharedTrip.Data.Common;
     using SharedTrip.Services;
     using System.Threading.Tasks;
 
@@ -20,7 +21,8 @@
                 .Add<IValidatorService, ValidatorService>()
                 .Add<IUserService, UserService>()
                 .Add<IPasswordHasher, PasswordHasher>()
-                .Add<ITripService, TripService>();
+                .Add<ITripService, TripService>()
+                .Add<IRepository, Repository>();
 
             await server.Start();
         }

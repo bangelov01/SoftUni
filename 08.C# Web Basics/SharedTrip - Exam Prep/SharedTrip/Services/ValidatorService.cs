@@ -1,7 +1,8 @@
 ﻿namespace SharedTrip.Services
 {
     using SharedTrip.Contracts;
-    using SharedTrip.Data;
+    using SharedTrip.Data.Common;
+    using SharedTrip.Data.Models;
     using SharedTrip.Models.Errors;
     using SharedTrip.Models.Trips;
     using SharedTrip.Models.Users;
@@ -9,21 +10,22 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using static Data.Constants.DataConstants;
 
     public class ValidatorService : IValidatorService
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IRepository repository;
 
-        public ValidatorService(ApplicationDbContext dbContext)
+        public ValidatorService(IRepository repository)
         {
-            this.dbContext = dbContext;
+            this.repository = repository;
         }
 
         public bool IsEmailAvailable(string email)
         {
-            if (this.dbContext.Users.Any(u => u.Email == email))
+            if (this.repository
+                .Many<User>()
+                .Any(u => u.Email == email))
             {
                 return false;
             }
@@ -33,7 +35,9 @@
 
         public bool IsUsernameAvailable(string username)
         {
-            if (this.dbContext.Users.Any(u => u.Username == username))
+            if (this.repository.
+                Many<User>().
+                Any(u => u.Username == username))
             {
                 return false;
             }
@@ -88,8 +92,8 @@
 
         public bool AreTripSeatsFree(string tripId)
         {
-            var seatNumber = dbContext
-                                .Trips
+            var seatNumber = repository
+                                .Single<Trip>()
                                 .Find(tripId)
                                 .Seats;
 
@@ -104,8 +108,8 @@
         public bool IsUserAlreadyInTrip(string tripId,
             string userId)
         {
-            var userTrip = dbContext
-                         .UsersTrips
+            var userTrip = repository
+                         .Many<UserTrip>()
                          .Where(t => t.UserId == userId 
                                   && t.TripId == tripId)
                          .FirstOrDefault();

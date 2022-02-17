@@ -1,7 +1,8 @@
 ﻿namespace SharedTrip.Services
 {
     using SharedTrip.Contracts;
-    using SharedTrip.Data;
+
+    using SharedTrip.Data.Common;
     using SharedTrip.Data.Models;
     using SharedTrip.Models.Trips;
     using System;
@@ -11,11 +12,11 @@
 
     public class TripService : ITripService
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IRepository repository;
 
-        public TripService(ApplicationDbContext dbContext)
+        public TripService(IRepository repository)
         {
-            this.dbContext = dbContext;
+            this.repository = repository;
         }
 
         public void AddTrip(TripListingFormModel model)
@@ -30,15 +31,15 @@
                 ImagePath = model.ImagePath
             };
 
-            dbContext.Trips.Add(trip);
-            dbContext.SaveChanges();
+            repository.Add(trip);
+            repository.SaveChanges();
         }
 
         public void AddUserToTrip(string tripId, string userId)
         {
-            var trip = dbContext
-                    .Trips
-                    .Find(tripId);
+            var trip = repository
+                     .Single<Trip>()
+                     .Find(tripId);
 
             trip.Seats -= 1;
 
@@ -48,14 +49,14 @@
                 UserId = userId
             };
 
-            dbContext.UsersTrips.Add(tripUser);
-            dbContext.SaveChanges();
+            repository.Add(tripUser);
+            repository.SaveChanges();
         }
 
         public ICollection<TripViewModel> GetAllTrips()
         {
-            return dbContext
-                      .Trips
+            return repository
+                      .Many<Trip>()
                       .Select(x => new TripViewModel
                       {
                           Id = x.Id,
@@ -69,8 +70,8 @@
 
         public TripDetailsViewModel GetTripById(string Id)
         {
-            return dbContext
-                      .Trips
+            return repository
+                      .Many<Trip>()
                       .Where(x => x.Id == Id)
                       .Select(x => new TripDetailsViewModel
                       {

@@ -1,11 +1,7 @@
-﻿using BasicWebServer.Server.Attributes;
-using BasicWebServer.Server.Controllers;
-using BasicWebServer.Server.HTTP;
-using SharedTrip.Contracts;
-using SharedTrip.Models.Users;
-
-namespace SharedTrip.Controllers
+﻿namespace SharedTrip.Controllers
 {
+    using BasicWebServer.Server.Controllers;
+    using BasicWebServer.Server.HTTP;
 
     public class HomeController : Controller
     {
