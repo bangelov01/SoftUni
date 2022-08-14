@@ -3,6 +3,10 @@
         {
             "id": 1,
             "title": "awesome title"
+        },
+        {
+            "id": 2,
+            "title": "another awesome title"
         }
     ]
 }
