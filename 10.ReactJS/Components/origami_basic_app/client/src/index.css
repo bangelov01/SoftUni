@@ -8,22 +8,13 @@ nav .listItem, footer .listItem {
     vertical-align: top;
 }
 
-nav .listItem a {
-    color: white;
-    text-decoration: none;
-}
-
-nav .listItem {
-    margin-top: -10px;
-}
-
 nav .listItem:not(:first-child) {
     padding: 1%;
     margin-top: -5px;
     border-top: 2px solid #ffa000;
-}
+} */
 
-nav .listItem:hover:not(:first-child) {
+.listItem:hover:not(:first-child) {
     border-top: none;
     border-bottom: 2px solid #ffa000;
     font-weight: bold;
