@@ -1,0 +1,1 @@
+export default () => <div className="Main"><h1>Error</h1></div>

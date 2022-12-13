@@ -1,9 +1,14 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'
+
 import style from './NavigationItem.module.css'
 
-const NavigationItem = (props) => {
+const NavigationItem = ({location, children}) => {
+    const [state, setState] = useState("")
+    useEffect(() => setState(location), [])
     return (
         <li className="listItem">
-            <a href="#" className={style.navListItem}>{props.children}</a>
+            <Link to={state} className={style.navListItem}>{children}</Link>
         </li>
     );
 }
