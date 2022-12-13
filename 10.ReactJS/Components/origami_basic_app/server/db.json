@@ -2,11 +2,13 @@
     "posts": [
         {
             "id": 1,
-            "title": "awesome title"
+            "author": "George Orwell",
+            "content": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum dolorem quos fuga. Architecto labore, inventore dolorem nam ut expedita fugiat laboriosam rerum sequi repellendus. Inventore libero ex illum porro ipsum."
         },
         {
             "id": 2,
-            "title": "another MORE awesome title"
+            "author": "J. D. Salinger",
+            "content": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum dolorem quos fuga. Architecto labore, inventore dolorem nam ut expedita fugiat laboriosam rerum sequi repellendus. Inventore libero ex illum porro ipsum."
         }
     ]
 }
