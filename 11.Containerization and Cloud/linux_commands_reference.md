@@ -61,7 +61,7 @@ ___
 
 - `---------` - 000 - no permissions
 - `rw-rw-rw-` - 666 - everyone read + write
-- `rwxr-xr-x` - 755 - owner full access, others read and write
+- `rwxr-xr-x` - 755 - owner fullaccess, others read and write
 - `rwxrwxrwx` - 777 - all permissions on everyone
 
 - `$ sudo` - allows a given user to act as an administrator/root user. Privilege to use `sudo` must be granted to the user i.e. entry in `/etc/sudoers` folder
