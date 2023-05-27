@@ -66,3 +66,16 @@ ___
 ### Solution commands:
 -   `docker build . -f ./TaskBoard.WebApp/Dockerfile -t <dockerHubUsername>/taskboard_app`
 -   `docker push <dockerHubUsername>/taskboard_app`
+
+___
+
+
+## Task 7: Tracker_App
+- In the Taskboard_App, build an image from a created Dockerfile
+- Build and Publish the Image to Docker Hub
+- Create a container from the image
+
+### Solution commands:
+-   `docker image build -t <dockerHubUsername>/tracker_app .`
+-   `docker push <dockerHubUsername>/tracker_app`
+-   `docker run --name tracker_app -p 8080:80 -d <dockerHubUsername>/tracker_app`

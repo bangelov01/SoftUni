@@ -18,6 +18,7 @@ ___
     -   `-v` - bind mount a volume
     -   `-w` - working directory in the container
     -   `--env` - describe environemnt variable
+    -   `--rm` - removes the container after it is stopped
 -   [`docker ps`](https://docs.docker.com/engine/reference/commandline/ps/) - list of all running containers
 -   `docker ps -a` - list of all containers
 -   `docker stop <container_id>/<container_name> (can be first 2 symbols)` - stops container
