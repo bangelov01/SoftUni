@@ -79,3 +79,28 @@ ___
 -   `docker image build -t <dockerHubUsername>/tracker_app .`
 -   `docker push <dockerHubUsername>/tracker_app`
 -   `docker run --name tracker_app -p 8080:80 -d <dockerHubUsername>/tracker_app`
+
+___
+
+
+## Task 8: Todo_App -  a React application with a NodeJS backend and a MongoDB database
+- Name the three containers "frontend", "backend" and "mongo"
+- Build images from the provided Dockerfiles for the frontend and backend services
+- Use the latest image for MongoDB from Docker Hub
+- Expose the frontend service on port 3000
+- Mount the following host directories as volumes:
+o For mongo service: .\data:/data/db
+- Connect the frontend and backend services to the react-express network and the backend and mongo
+services to the express-mongo network
+
+### Solution commands:
+-   `docker network create react_express`
+-   `docker network create express_mongo`
+-   `docker image build -t backend_app_img .`
+-   `docker run -p 27017:27017 --name mongo -v .\data:/data/db  -d mongo:latest`
+-   `docker run --name backend -d backend_app_img`
+-   `docker run -p 3000:3000 --name frontend -d frontend_app_img`
+-   `docker network connect express_mongo mongo`
+-   `docker network connect express_mongo backend`
+-   `docker network connect react_express backend`
+-   `docker network connect react_express frontend`
