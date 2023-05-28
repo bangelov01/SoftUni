@@ -125,3 +125,7 @@ documentation
 -   Write Dockerfile in Blue_Vs_Green_App/vote
 -   `docker image build -t worker .`
 -   `docker image build -t vote .`
+-   Write docker-compose.yaml file
+-   `docker compose build`
+-   `docker compose up -d`
+-   `docker compose down --rmi all --volumes` - cleanup

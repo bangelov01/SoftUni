@@ -6,11 +6,11 @@ WORKDIR /app
 # Copy the .csproj file and restore
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
 WORKDIR /src
-COPY ["src/Worker/Worker.csproj", "Worker/"]
+COPY ["worker/src/Worker/Worker.csproj", "Worker/"]
 RUN dotnet restore "Worker/Worker.csproj"
 
 # Copy source files to the image
-COPY src/Worker .
+COPY worker/src/Worker .
 
 # Build the project
 RUN dotnet build "Worker.csproj" -c Release -o /app/build
