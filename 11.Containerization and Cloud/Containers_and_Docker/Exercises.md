@@ -83,7 +83,7 @@ ___
 ___
 
 
-## Task 8: Todo_App -  a React application with a NodeJS backend and a MongoDB database
+## Task 8: Todo_App - a React application with a NodeJS backend and a MongoDB database
 - Name the three containers "frontend", "backend" and "mongo"
 - Build images from the provided Dockerfiles for the frontend and backend services
 - Use the latest image for MongoDB from Docker Hub
@@ -104,3 +104,24 @@ services to the express-mongo network
 -   `docker network connect express_mongo backend`
 -   `docker network connect react_express backend`
 -   `docker network connect react_express frontend`
+
+___
+
+## Task 9: Blue_Vs_Green_App - simple voting app
+- Use the latest images for PostgeSQL and Redis from Docker Hub and use the Dockerfiles you created for the 
+voting and worker app
+- PostgreSQL container needs user and password for login: see how to set them in the image's 
+documentation
+- The voting app should be accessed on localhost:5000 and the result app – on localhost:5001
+- Network traffic should be separated to two networks – frontend and backend:
+    - The frontend network is for the users' traffic. Connect the voting app and the result app to it
+    - The backend network is for the traffic within the app. It connects all app components
+- Run the voting and result apps in the containers
+- Use volumes for the voting and result apps and the db container
+- Run everything with docker compose
+
+### Solution:
+-   Write Dockerfile in Blue_Vs_Green_App/worker
+-   Write Dockerfile in Blue_Vs_Green_App/vote
+-   `docker image build -t worker .`
+-   `docker image build -t vote .`
