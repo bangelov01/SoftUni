@@ -11,3 +11,4 @@ consistency
 infrastructure, use after changes to config file also
 -   `terraform show` - inspect the current state
 -   `terraform destroy` - terminate resources managed by terraform
+-   `terraform apply -var-file="values.tfvars"` - apply with set variables file
