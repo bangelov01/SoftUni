@@ -1,0 +1,7 @@
+-   `az group create --name "bangelov01libraryrg" --location westeurope` - create resource group
+-   `az acr create --resource-group bangelov01libraryrg --name bangelov01librarycr --sku Basic` - create azure container registry
+-   `docker tag mylibraryimage bangelov01librarycr.azurecr.io/library` - tag our container to azure container registry
+-   `az acr login --name bangelov01librarycr` - login to azure container registry
+-   `docker push bangelov01librarycr.azurecr.io/library` - push our image to azure container registry
+-   `docker context create aci librarycontext` - create aci context
+-   `docker context use librarycontext` - switch to azure context
