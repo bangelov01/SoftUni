@@ -66,7 +66,6 @@
 
         public void Insert(int index, T item)
         {
-            //if (index < 0 || index > this.Count) throw new IndexOutOfRangeException();
             this.Validate(index);
 
             ShouldGrow();
