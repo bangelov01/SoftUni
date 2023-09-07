@@ -41,7 +41,9 @@
 
         public Tree<T> GetDeepestLeftomostNode()
         {
-            throw new NotImplementedException();
+            int deepestLevel = 1;
+            Tree<T> deepestNode = null;
+            return GetDeepestLeftomostNodeDfs(ref deepestNode, ref deepestLevel);
         }
 
         public List<T> GetLeafKeys() => this.GetLeafKeysBfs();
@@ -52,7 +54,39 @@
 
         public List<List<T>> PathsWithGivenSum(int sum)
         {
-            throw new NotImplementedException();
+            //var leafNodes = this.GetLeafNodesBfs();
+
+            //var resultList = new List<List<T>>();
+
+            //foreach ( var leaf in leafNodes )
+            //{
+            //    var node = leaf;
+            //    int pathSum = 0;
+            //    var currentNodes = new List<T>();
+
+            //    while (node != null)
+            //    {
+            //        pathSum += Convert.ToInt32(node.Key);
+            //        currentNodes.Add(node.Key);
+            //        node = node.Parent;
+            //    }
+
+            //    if (pathSum == sum)
+            //    {
+            //        currentNodes.Reverse();
+            //        resultList.Add(currentNodes);
+            //    }
+            //}
+
+            //return resultList;
+
+            int currentSum = Convert.ToInt32(this.Key);
+            var allPaths = new List<List<T>>();
+            var currentPathsValues = new List<T> { this.Key };
+
+            this.PathsWithGivenSumDfsExample(ref currentSum, sum, allPaths, currentPathsValues);
+
+            return allPaths;
         }
 
         public List<Tree<T>> SubTreesWithGivenSum(int sum)
@@ -86,6 +120,32 @@
                 if (!element.children.Any())
                 {
                     leafResult.Add(element.Key);
+                    continue;
+                }
+
+                foreach (var child in element.children)
+                {
+                    queue.Enqueue(child);
+                }
+            }
+
+            return leafResult;
+        }
+
+        private List<Tree<T>> GetLeafNodesBfs()
+        {
+            var leafResult = new List<Tree<T>>();
+
+            var queue = new Queue<Tree<T>>();
+            queue.Enqueue(this);
+
+            while (queue.Count > 0)
+            {
+                var element = queue.Dequeue();
+
+                if (!element.children.Any())
+                {
+                    leafResult.Add(element);
                     continue;
                 }
 
@@ -136,6 +196,40 @@
             }
 
             return nodes;
+        }
+
+        private Tree<T> GetDeepestLeftomostNodeDfs(ref Tree<T> deepestNode, ref int deepestLevel, int level = 1)
+        {
+            if (level > deepestLevel && !this.Children.Any())
+            {
+                deepestLevel = level;
+                deepestNode = this;
+            }
+
+            foreach(var child in this.Children)
+            {
+                child.GetDeepestLeftomostNodeDfs(ref deepestNode, ref deepestLevel, level + 1);
+            }
+
+            return deepestNode;
+        }
+
+        private void PathsWithGivenSumDfsExample(ref int currentSum, int targetSum, List<List<T>> allPaths, List<T> currentPathValues)
+        {
+            foreach (var child in this.Children)
+            {
+                currentPathValues.Add(child.Key);
+                currentSum += Convert.ToInt32(child.Key);
+                child.PathsWithGivenSumDfsExample(ref currentSum, targetSum, allPaths, currentPathValues);
+            }
+
+            if (currentSum == targetSum)
+            {
+                allPaths.Add(new List<T>(currentPathValues));
+            }
+
+            currentSum -= Convert.ToInt32(this.Key);
+            currentPathValues.RemoveAt(currentPathValues.Count - 1);
         }
     }
 }
