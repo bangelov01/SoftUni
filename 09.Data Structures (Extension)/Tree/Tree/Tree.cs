@@ -91,7 +91,11 @@
 
         public List<Tree<T>> SubTreesWithGivenSum(int sum)
         {
-            throw new NotImplementedException();
+            var roots = new List<Tree<T>>();
+
+            SubTreesWithGivenSumDfs(sum, roots);
+
+            return roots;
         }
 
         private string GetAsStringDfs(int indentation = 0)
@@ -230,6 +234,23 @@
 
             currentSum -= Convert.ToInt32(this.Key);
             currentPathValues.RemoveAt(currentPathValues.Count - 1);
+        }
+
+        private int SubTreesWithGivenSumDfs(int targetSum, List<Tree<T>> roots)
+        {
+            var currentSum = Convert.ToInt32(this.Key);
+
+            foreach (var child in this.Children)
+            {
+                currentSum += child.SubTreesWithGivenSumDfs(targetSum, roots);
+            }
+
+            if (currentSum == targetSum)
+            {
+                roots.Add(this);
+            }
+
+            return currentSum;
         }
     }
 }
