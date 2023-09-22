@@ -12,8 +12,7 @@
 
         private BinarySearchTree(Node<T> node)
         {
-            // Keep from inserting a larger element in sub-trees than upper roots
-            // and breaking tree structure.
+            // Create a copy of the subtree in order to not break structure.
             this.PreOrderCopy(node);
         }
 
@@ -33,10 +32,7 @@
         {
             var node = this.FindNode(element);
 
-            if (node == null)
-            {
-                return null;
-            }
+            if (node == null) return null;
 
             return new BinarySearchTree<T>(node);
         }
