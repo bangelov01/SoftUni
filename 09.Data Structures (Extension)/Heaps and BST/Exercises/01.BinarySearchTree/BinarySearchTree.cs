@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Xml.Linq;
 
     public class BinarySearchTree<T> : IBinarySearchTree<T> where T : IComparable
     {
@@ -14,7 +13,7 @@
                 this.Value = value;
             }
 
-            public T Value { get; }
+            public T Value { get; set; }
             public Node Left { get; set; }
             public Node Right { get; set; }
         }
@@ -56,7 +55,59 @@
 
         public void Delete(T element)
         {
-            throw new NotImplementedException();
+            if (this.root == null) throw new InvalidOperationException();
+
+            this.root = this.Delete(element, this.root);
+        }
+
+        private Node Delete(T element, Node root)
+        {
+            if (root == null) return root;
+
+            if (element.CompareTo(root.Value) < 0)
+            {
+                root.Left = this.Delete(element, root.Left);
+                return root;
+            }
+            else if (element.CompareTo(root.Value) > 0)
+            {
+                root.Right = this.Delete(element, root.Right);
+                return root;
+            }
+
+            if (root.Left == null)
+            {
+                return root.Right;
+            }
+            else if (root.Right == null)
+            {
+                return root.Left;
+            }
+            else
+            {
+                var parent = root;
+
+                var successor = root.Right;
+
+                while (successor.Left != null)
+                {
+                    parent = successor;
+                    successor = successor.Left;
+                }
+
+                if (parent != root)
+                {
+                    parent.Left = successor.Right;
+                }
+                else
+                {
+                    parent.Right = successor.Right;
+                }
+
+                root.Value = successor.Value;
+
+                return root;
+            }
         }
 
         public void DeleteMax()
