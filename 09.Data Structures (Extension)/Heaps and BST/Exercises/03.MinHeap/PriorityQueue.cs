@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace _03.MinHeap
 {
@@ -12,17 +13,18 @@ namespace _03.MinHeap
 
         public void Enqueue(T element)
         {
-            throw new NotImplementedException();
+            base.Add(element);
         }
 
         public T Dequeue()
         {
-            throw new NotImplementedException();
+            return base.ExtractMin();
         }
 
         public void DecreaseKey(T key)
         {
-            throw new NotImplementedException();
+            var index = this.elements.IndexOf(key);
+            base.HeapifyUp(index);
         }
     }
 }

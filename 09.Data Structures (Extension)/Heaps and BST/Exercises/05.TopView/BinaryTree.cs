@@ -22,7 +22,23 @@
 
         public List<T> TopView()
         {
-            throw new NotImplementedException();
+            var dict = new Dictionary<int, (T nodeValue, int nodeLevel)>();
+            this.TopView(this, 0, 0, dict);
+
+            return dict.Values.Select(v => v.nodeValue).ToList();
+        }
+
+        private void TopView(BinaryTree<T> node, int horizontalDistance, int level, Dictionary<int, (T nodeValue, int nodeLevel)> dict)
+        {
+            if (node == null) return;
+
+            if(!dict.ContainsKey(horizontalDistance))
+            {
+                dict.Add(horizontalDistance, (node.Value, level));
+            }
+
+            this.TopView(node.LeftChild, horizontalDistance - 1, level + 1, dict);
+            this.TopView(node.RightChild, horizontalDistance + 1, level + 1, dict);
         }
     }
 }
