@@ -12,7 +12,7 @@
 
         private BinarySearchTree(Node<T> node)
         {
-            // Create a copy of the subtree in order to not break structure.
+            // Create a copy of the subtree in order to renew references;
             this.PreOrderCopy(node);
         }
 
