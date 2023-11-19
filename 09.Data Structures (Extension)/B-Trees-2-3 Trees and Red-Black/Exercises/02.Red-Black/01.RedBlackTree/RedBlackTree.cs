@@ -88,17 +88,79 @@
 
         public void Delete(T key)
         {
-            throw new NotImplementedException();
+            if (this.root == null) {
+                throw new InvalidOperationException();
+            }
         }
 
+        // Sample case:
+        //                      7b                                             12b
+        //              3b             12b          ------>               7r          16b
+        //          1b      6b    9b         16b                      6b      9b   15r
+        //                               15r                      3r
         public void DeleteMin()
         {
-            throw new NotImplementedException();
+            if (this.root == null) {
+                throw new InvalidOperationException();
+            }
+
+            this.root = this.DeleteMin(this.root);
+
+            if (this.root != null) {
+                this.root.Color = Black;
+            }
+        }
+
+        private Node DeleteMin(Node node)
+        {
+            // Not possible for a node to have only a right child.
+            if (node.Left == null) return null;
+
+            if (!IsRed(node.Left) && !IsRed(node.Left.Left)) {
+                node = this.MoveRedLeft(node);
+            };
+
+            node.Left = DeleteMin(node.Left);
+
+            // After deletion check node by node upwards and fix discrepancies.
+            return this.FixUp(node);
+        }
+
+        private Node MoveRedLeft(Node node)
+        {
+            this.FlipColors(node);
+
+            if (IsRed(node.Right.Left)) {
+                node.Right = this.RotateRight(node.Right);
+                node = this.RotateLeft(node);
+                this.FlipColors(node);
+            }
+            
+            return node;
+        }
+        
+        private Node FixUp(Node node)
+        {
+            if (IsRed(node.Right)) {
+                node = this.RotateLeft(node);
+            }
+
+            if (IsRed(node.Left) && IsRed(node.Left.Left)) {
+                node = this.RotateRight(node);
+            }
+
+            if (IsRed(node.Left) && IsRed(node.Right)) {
+                FlipColors(node);
+            }
+
+            return node;
         }
 
         public void DeleteMax()
         {
-            throw new NotImplementedException();
+            if (this.root == null) {
+                throw new InvalidOperationException();
+            }
         }
 
         public int Count() => this.Count(this.root);
@@ -134,10 +196,9 @@
 
             // Case when the node to rotate (node.Left) has a right child.
             // When rotated, it should become the left child of the rotated node (node.Left)'s right child.
-            // This example shows only the rotation, colors are unbalanced.
-            //          12b                         5b
-            //      5r       15b    ------>     3r        12r
-            //  3r       8b                         8b       15b
+            //          12                         5
+            //      5       15    ------>     3        12
+            //  3       8                         8       15
 
             var tempNode = node.Left;
             node.Left = tempNode.Right;
