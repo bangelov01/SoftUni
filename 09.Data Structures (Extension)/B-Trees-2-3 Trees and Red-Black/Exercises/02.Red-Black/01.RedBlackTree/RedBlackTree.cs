@@ -68,17 +68,17 @@
             // Left rotation -> Right rotation (possible)
             // Right rotation -> Left rotation (never)
 
-            if (IsRed(node.Right)) {
+            if (this.IsRed(node.Right)) {
 
                 node = this.RotateLeft(node);
             }
 
-            if (IsRed(node.Left) && IsRed(node.Left.Left)) {
+            if (this.IsRed(node.Left) && this.IsRed(node.Left.Left)) {
 
                 node = this.RotateRight(node);
             }
 
-            if (IsRed(node.Left) && IsRed(node.Right)) {
+            if (this.IsRed(node.Left) && this.IsRed(node.Right)) {
                 
                 this.FlipColors(node);
             }
@@ -116,7 +116,7 @@
             // Not possible for a node to have only a right child.
             if (node.Left == null) return null;
 
-            if (!IsRed(node.Left) && !IsRed(node.Left.Left)) {
+            if (!this.IsRed(node.Left) && !this.IsRed(node.Left.Left)) {
                 node = this.MoveRedLeft(node);
             };
 
@@ -130,7 +130,7 @@
         {
             this.FlipColors(node);
 
-            if (IsRed(node.Right.Left)) {
+            if (this.IsRed(node.Right.Left)) {
                 node.Right = this.RotateRight(node.Right);
                 node = this.RotateLeft(node);
                 this.FlipColors(node);
@@ -138,18 +138,30 @@
             
             return node;
         }
+
+        private Node MoveRedRight(Node node)
+        {
+            this.FlipColors(node);
+
+            if (this.IsRed(node.Left.Left)) {
+                node = this.RotateRight(node);
+                this.FlipColors(node);
+            }
+
+            return node;
+        }
         
         private Node FixUp(Node node)
         {
-            if (IsRed(node.Right)) {
+            if (this.IsRed(node.Right)) {
                 node = this.RotateLeft(node);
             }
 
-            if (IsRed(node.Left) && IsRed(node.Left.Left)) {
+            if (this.IsRed(node.Left) && this.IsRed(node.Left.Left)) {
                 node = this.RotateRight(node);
             }
 
-            if (IsRed(node.Left) && IsRed(node.Right)) {
+            if (this.IsRed(node.Left) && this.IsRed(node.Right)) {
                 FlipColors(node);
             }
 
@@ -161,6 +173,25 @@
             if (this.root == null) {
                 throw new InvalidOperationException();
             }
+
+            this.root = this.DeleteMax(this.root);
+        }
+
+        private Node DeleteMax(Node node)
+        {
+            if (this.IsRed(node.Left)) {
+                node = this.RotateRight(node);
+            }
+
+            if (node.Right == null) return null;
+
+            if (!this.IsRed(node.Right) && !this.IsRed(node.Right.Left)) {
+                node = this.MoveRedRight(node);
+            }
+
+            node.Right = this.DeleteMax(node.Right);
+
+            return this.FixUp(node);
         }
 
         public int Count() => this.Count(this.root);
